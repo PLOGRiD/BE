@@ -1,169 +1,160 @@
-package com.seohaeng.backend.global.security.jwt;
+package com.example.plogrid.global.security.jwt;
 
-import com.seohaeng.backend.domain.user.entity.LoginInfo;
-import com.seohaeng.backend.domain.user.repository.LoginInfoRepository;
-import com.seohaeng.backend.global.apiPayload.code.status.ErrorStatus;
-import com.seohaeng.backend.global.apiPayload.exception.handler.UserHandler;
-import com.seohaeng.backend.global.security.userDetails.LocalCustomUserDetails;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
+import javax.crypto.SecretKey;
+
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.nio.charset.StandardCharsets;
-import java.security.Key;
-import java.util.Date;
+import com.example.plogrid.global.security.userdetails.MemberDetails;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class JwtTokenProvider {
 
-    private final LoginInfoRepository loginInfoRepository;
-    private final RedisTemplate<String, Object> redisTemplate;
+	private static final String AUTHORIZATION_HEADER = "Authorization";
+	private static final String BEARER_PREFIX = "Bearer ";
+	private static final String BLACKLIST_PREFIX = "blacklist:accessToken:";
+	private static final String REFRESH_PREFIX = "refresh:";
 
-    private static final String HEADER_STRING = "Authorization";
-    private static final String HEADER_STRING_PREFIX = "Bearer ";
+	private final StringRedisTemplate redisTemplate;
 
-    @Value("${jwt.token.secretKey}")
-    private String signingKey;
+	@Value("${jwt.token.secretKey}")
+	private String signingKey;
 
-    @Value("${jwt.token.expiration.access}")
-    private long accessTokenExpiration;
+	@Value("${jwt.token.expiration.access}")
+	private long accessTokenExpiration;
 
-    @Value("${jwt.token.expiration.refresh}")
-    private long refreshTokenExpiration;
+	@Value("${jwt.token.expiration.refresh}")
+	private long refreshTokenExpiration;
 
-    private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(signingKey.getBytes(StandardCharsets.UTF_8));
-    }
+	private SecretKey getSigningKey() {
+		return Keys.hmacShaKeyFor(signingKey.getBytes(StandardCharsets.UTF_8));
+	}
 
-    public String generateToken(Authentication authentication, long validityMilliseconds) {
-        String username = authentication.getName();
+	// ── Access Token ──────────────────────────────────────────────
 
-        LoginInfo loginUserLoginInfo = loginInfoRepository.findByUsernameWithUser(username)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.LOGIN_INFO_NOT_FOUND));
+	public String createAccessToken(Long memberId, String username) {
+		return buildToken(memberId, username, accessTokenExpiration);
+	}
 
-        com.seohaeng.backend.domain.user.entity.User loginUser = loginUserLoginInfo.getUser();
+	public void blacklistToken(String token) {
+		long remainingMs = getRemainingValidity(token);
+		if (remainingMs > 0) {
+			redisTemplate.opsForValue().set(
+				BLACKLIST_PREFIX + token,
+				"blacklisted",
+				remainingMs,
+				TimeUnit.MILLISECONDS
+			);
+		}
+	}
 
-        Long UserId = loginUser.getId();
+	public boolean isBlacklisted(String token) {
+		return Boolean.TRUE.equals(redisTemplate.hasKey(BLACKLIST_PREFIX + token));
+	}
 
-        return Jwts.builder()
-                .setSubject(username)
-                .claim("id",UserId)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + validityMilliseconds))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
+	// ── Refresh Token ─────────────────────────────────────────────
 
-    public String createAccessToken(Authentication authentication) {
-        return generateToken(authentication, accessTokenExpiration);
-    }
+	public String createRefreshToken(Long memberId, String username) {
+		return buildToken(memberId, username, refreshTokenExpiration);
+	}
 
-    public String createRefreshToken(Authentication authentication) {
-        return generateToken(authentication, refreshTokenExpiration);
-    }
+	public void saveRefreshToken(Long memberId, String refreshToken) {
+		redisTemplate.opsForValue().set(
+			REFRESH_PREFIX + memberId,
+			refreshToken,
+			refreshTokenExpiration,
+			TimeUnit.MILLISECONDS
+		);
+	}
 
-    // 토큰 추출
-    public String extractToken (final HttpServletRequest request) {
-        String authorizationHeader = request.getHeader(HEADER_STRING);
+	public String getRefreshToken(Long memberId) {
+		return redisTemplate.opsForValue().get(REFRESH_PREFIX + memberId);
+	}
 
-        if (authorizationHeader != null && authorizationHeader.startsWith(HEADER_STRING_PREFIX)) {
-            return authorizationHeader.substring(7);
-        }
-        throw new UserHandler(ErrorStatus.INVALID_TOKEN);
-    }
+	public void deleteRefreshToken(Long memberId) {
+		redisTemplate.delete(REFRESH_PREFIX + memberId);
+	}
 
-    // 토큰 유효성 검증
-    public boolean validateToken(String token) {
-        try{
-            Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey())
-                    .build()
-                    .parseClaimsJws(token);
-            return true;
-        }catch(JwtException | IllegalArgumentException e) {
-            return false;
-        }
-    }
+	// ── 공통 ──────────────────────────────────────────────────────
 
-    public boolean isBlacklisted(String token) {
-        String redisKey = "blacklist:accessToken:" + token;
-        return Boolean.TRUE.equals(redisTemplate.hasKey(redisKey));
-    }
+	private String buildToken(Long memberId, String username, long validityMs) {
+		return Jwts.builder()
+			.subject(username)
+			.claim("id", memberId)
+			.issuedAt(new Date())
+			.expiration(new Date(System.currentTimeMillis() + validityMs))
+			.signWith(getSigningKey())
+			.compact();
+	}
 
-    public Authentication getAuthentication(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+	public boolean validateToken(String token) {
+		try {
+			Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token);
+			return true;
+		} catch (JwtException | IllegalArgumentException e) {
+			return false;
+		}
+	}
 
-        String username = claims.getSubject();
+	public Authentication getAuthentication(String token) {
+		Claims claims = Jwts.parser()
+			.verifyWith(getSigningKey())
+			.build()
+			.parseSignedClaims(token)
+			.getPayload();
 
-        LoginInfo loginInfo = loginInfoRepository.findByUsernameWithUser(username)
-                .orElseThrow(() -> new UserHandler(ErrorStatus.USER_NOT_FOUND));
+		MemberDetails principal = new MemberDetails(
+			claims.get("id", Long.class),
+			claims.getSubject(),
+			null
+		);
+		return new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
+	}
 
-        com.seohaeng.backend.domain.user.entity.User user = loginInfo.getUser();
-        LocalCustomUserDetails principal = new LocalCustomUserDetails(user, loginInfo);
+	public Long getMemberIdFromToken(String token) {
+		return Jwts.parser()
+			.verifyWith(getSigningKey())
+			.build()
+			.parseSignedClaims(token)
+			.getPayload()
+			.get("id", Long.class);
+	}
 
-        return new UsernamePasswordAuthenticationToken(
-                principal,
-                token,
-                principal.getAuthorities()
-        );
-    }
+	public long getRemainingValidity(String token) {
+		try {
+			Date expiration = Jwts.parser()
+				.verifyWith(getSigningKey())
+				.build()
+				.parseSignedClaims(token)
+				.getPayload()
+				.getExpiration();
+			return Math.max(expiration.getTime() - System.currentTimeMillis(), 0);
+		} catch (JwtException | IllegalArgumentException e) {
+			return 0;
+		}
+	}
 
-    public String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring("Bearer " .length());
-        }
-        return null;
-    }
-
-    public Authentication extractAuthentication(HttpServletRequest request){
-        String accessToken = resolveToken(request);
-        if(accessToken == null || !validateToken(accessToken)) {
-            throw new UserHandler(ErrorStatus.INVALID_TOKEN);
-        }
-        return getAuthentication(accessToken);
-    }
-
-    public Long getUserIdFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        
-        return claims.get("id", Long.class);
-    }
-
-    public long getRemainingValidity(String token) {
-        try {
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey())
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-
-            long expirationTime = claims.getExpiration().getTime();
-            long currentTime = System.currentTimeMillis();
-
-            long remainingTime = expirationTime - currentTime;
-            return Math.max(remainingTime, 0);
-        } catch (JwtException | IllegalArgumentException e) {
-            return 0;
-        }
-    }
+	public String resolveToken(HttpServletRequest request) {
+		String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
+		if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+			return bearerToken.substring(BEARER_PREFIX.length());
+		}
+		return null;
+	}
 }

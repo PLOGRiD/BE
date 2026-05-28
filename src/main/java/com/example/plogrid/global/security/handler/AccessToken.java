@@ -1,11 +1,11 @@
-package com.seohaeng.backend.global.security.handler;
-
-import io.swagger.v3.oas.annotations.Parameter;
+package com.example.plogrid.global.security.handler;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import io.swagger.v3.oas.annotations.Parameter;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)

@@ -1,76 +1,55 @@
-package com.seohaeng.backend.global.security.jwt;
+package com.example.plogrid.global.security.jwt;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import java.io.IOException;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenProvider jwtTokenProvider;
+	private final JwtTokenProvider jwtTokenProvider;
 
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
+	@Override
+	protected void doFilterInternal(HttpServletRequest request,
+		HttpServletResponse response,
+		FilterChain filterChain)
+		throws ServletException, IOException {
 
-        String path = request.getRequestURI();
+		if (isPermitAllPath(request.getRequestURI())) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
-        if (isPermitAllPath(path)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+		String token = jwtTokenProvider.resolveToken(request);
 
-        String token = resolveToken(request);
+		if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token) && !jwtTokenProvider.isBlacklisted(token)) {
+			Authentication authentication = jwtTokenProvider.getAuthentication(token);
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+		}
 
-        if (StringUtils.hasText(token) && !jwtTokenProvider.isBlacklisted(token) && jwtTokenProvider.validateToken(token)) {
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
-        filterChain.doFilter(request, response);
-    }
+		filterChain.doFilter(request, response);
+	}
 
-    private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
-    }
-
-    private void setJsonResponse(HttpServletResponse response, int statusCode, String code, String message)
-            throws IOException {
-        response.setStatus(statusCode);
-        response.setContentType("application/json;charset=UTF-8");
-        String jsonResponse = String.format("{\"isSuccess\": false, \"code\": \"%s\", \"message\": \"%s\"}", code,
-                message);
-        response.getWriter().write(jsonResponse);
-    }
-
-    private boolean isPermitAllPath(String path) {
-        return path.startsWith("/swagger-ui")
-                || path.startsWith("/v3/api-docs")
-                || path.startsWith("/swagger-resources")
-                || path.startsWith("/webjars")
-                || path.equals("/swagger-ui.html")
-
-                // 로그인/토큰발급 등등
-                || path.startsWith("/api/v1/users/auth/**")
-                || path.startsWith("/test")
-                || path.startsWith("/api/v1/common/health/**")
-
-                // 필요하다면 다른 permitAll 경로들도 추가
-                // ...
-                ;
-    }
+	private boolean isPermitAllPath(String path) {
+		return path.startsWith("/swagger-ui")
+			|| path.startsWith("/v3/api-docs")
+			|| path.startsWith("/swagger-resources")
+			|| path.startsWith("/webjars")
+			|| path.equals("/swagger-ui.html")
+			|| path.startsWith("/api/v1/members/auth/sign-up")
+			|| path.startsWith("/api/v1/members/auth/sign-in")
+			|| path.startsWith("/api/v1/members/auth/reissue")
+			|| path.startsWith("/api/v1/common/health");
+	}
 }
