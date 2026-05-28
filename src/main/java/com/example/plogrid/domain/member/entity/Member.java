@@ -1,5 +1,7 @@
 package com.example.plogrid.domain.member.entity;
 
+import java.time.LocalDateTime;
+
 import com.example.plogrid.domain.common.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -29,4 +31,30 @@ public class Member extends BaseEntity {
 
 	@Column(nullable = false)
 	private String password;
+
+	@Column(nullable = false, unique = true)
+	private String email;
+
+	@Column(nullable = false)
+	private String nickname;
+
+	@Column
+	private LocalDateTime deletedAt;
+
+	public static Member create(String username, String password, String email, String nickname) {
+		return Member.builder()
+			.username(username)
+			.password(password)
+			.email(email)
+			.nickname(nickname)
+			.build();
+	}
+
+	public void delete() {
+		this.username = "deleted_" + this.id;
+		this.email = "deleted_" + this.id + "@deleted.invalid";
+		this.password = "DELETED";
+		this.nickname = "알 수 없음";
+		this.deletedAt = LocalDateTime.now();
+	}
 }
