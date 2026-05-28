@@ -7,7 +7,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: ${DDL_AUTO:update}
     show-sql: false
     defer-datasource-initialization: true
     properties:
@@ -18,3 +18,15 @@ spring:
         jdbc:
           batch_size: 1000
     open-in-view: false
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+
+jwt:
+  token:
+    secretKey: ${JWT_SECRET_KEY}
+    expiration:
+      access: 3600000
+      refresh: 1209600000
