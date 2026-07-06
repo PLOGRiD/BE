@@ -33,4 +33,17 @@ public class MemberController {
 	public ApiResponse<MemberResponseDTO.MemberProfileDTO> getMyProfile(@AuthUser Long memberId) {
 		return ApiResponse.onSuccess(memberQueryService.getMyProfile(memberId));
 	}
+
+	@Operation(
+		summary = "사용자 환경 기여 정보 조회 API",
+		description = """
+			로그인한 회원의 환경 기여 정보를 조회합니다.
+
+			- `Authorization: Bearer {accessToken}` 헤더가 필요합니다.
+			"""
+	)
+	@GetMapping("/contribution")
+	public ApiResponse<MemberResponseDTO.MemberContributionDTO> getMyContribution(@AuthUser Long memberId) {
+		return ApiResponse.onSuccess(memberQueryService.getMyContribution(memberId));
+	}
 }
