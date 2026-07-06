@@ -7,7 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.plogrid.domain.member.dto.MemberRequestDTO;
 import com.example.plogrid.domain.member.dto.MemberResponseDTO;
 import com.example.plogrid.domain.member.entity.Member;
+import com.example.plogrid.domain.member.entity.MemberStatistics;
 import com.example.plogrid.domain.member.repository.MemberRepository;
+import com.example.plogrid.domain.member.repository.MemberStatisticsRepository;
 import com.example.plogrid.global.apiPayload.code.MemberErrorCode;
 import com.example.plogrid.global.apiPayload.exception.GeneralException;
 import com.example.plogrid.global.security.jwt.JwtTokenProvider;
@@ -20,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberAuthService {
 
 	private final MemberRepository memberRepository;
+	private final MemberStatisticsRepository memberStatisticsRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtTokenProvider jwtTokenProvider;
 
@@ -33,12 +36,13 @@ public class MemberAuthService {
 		if (memberRepository.existsByEmail(request.getEmail())) {
 			throw new GeneralException(MemberErrorCode.DUPLICATE_EMAIL);
 		}
-		memberRepository.save(Member.create(
+		Member member = memberRepository.save(Member.create(
 			request.getUsername(),
 			passwordEncoder.encode(request.getPassword()),
 			request.getEmail(),
 			request.getUsername()
 		));
+		memberStatisticsRepository.save(MemberStatistics.create(member));
 	}
 
 	public MemberResponseDTO.Token signIn(MemberRequestDTO.SignIn request) {
