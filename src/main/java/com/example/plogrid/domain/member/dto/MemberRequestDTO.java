@@ -27,14 +27,14 @@ public class MemberRequestDTO {
 		)
 		private String password;
 
+		@Schema(description = "비밀번호 확인", example = "pass1234!")
+		@NotBlank(message = "비밀번호 확인을 입력해주세요.")
+		private String passwordConfirm;
+
 		@Schema(description = "이메일", example = "john@example.com")
 		@NotBlank(message = "이메일을 입력해주세요.")
 		@Email(message = "올바른 이메일 형식이 아닙니다.")
 		private String email;
-
-		@Schema(description = "닉네임", example = "달리는존")
-		@NotBlank(message = "닉네임을 입력해주세요.")
-		private String nickname;
 	}
 
 	@Schema(name = "로그인 요청")

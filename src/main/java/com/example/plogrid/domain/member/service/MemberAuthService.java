@@ -24,6 +24,9 @@ public class MemberAuthService {
 	private final JwtTokenProvider jwtTokenProvider;
 
 	public void signUp(MemberRequestDTO.SignUp request) {
+		if (!request.getPassword().equals(request.getPasswordConfirm())) {
+			throw new GeneralException(MemberErrorCode.PASSWORD_MISMATCH);
+		}
 		if (memberRepository.existsByUsername(request.getUsername())) {
 			throw new GeneralException(MemberErrorCode.DUPLICATE_USERNAME);
 		}
@@ -34,7 +37,7 @@ public class MemberAuthService {
 			request.getUsername(),
 			passwordEncoder.encode(request.getPassword()),
 			request.getEmail(),
-			request.getNickname()
+			request.getUsername()
 		));
 	}
 
