@@ -17,4 +17,16 @@ public class MemberResponseDTO {
 		@Schema(description = "Refresh Token (유효기간 14일)", example = "eyJhbGciOiJIUzI1NiJ9...")
 		private String refreshToken;
 	}
+
+	@Schema(name = "사용자 정보 조회 응답")
+	@Builder
+	@Getter
+	public static class MemberProfileDTO {
+
+		@Schema(description = "사용자 닉네임", example = "김나나")
+		private String nickName;
+
+		@Schema(description = "이메일", example = "plogrid2026@gmail.com")
+		private String email;
+	}
 }

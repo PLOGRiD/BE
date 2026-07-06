@@ -16,7 +16,12 @@ public enum MemberErrorCode implements BaseErrorCode {
 	DUPLICATE_EMAIL(HttpStatus.CONFLICT, "MEMBER409_2", "이미 사용 중인 이메일입니다."),
 	INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "MEMBER401_1", "비밀번호가 올바르지 않습니다."),
 	ALREADY_WITHDRAWN(HttpStatus.BAD_REQUEST, "MEMBER400_1", "이미 탈퇴한 회원입니다."),
-	INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "MEMBER401_2", "유효하지 않은 Refresh 토큰입니다.");
+	INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "MEMBER401_2", "유효하지 않은 Refresh 토큰입니다."),
+
+	// 사용자 관련
+	NOT_FOUND_MEMBER(HttpStatus.NOT_FOUND, "MEMBER404_1", "존재하지 않는 회원입니다."),
+
+		;
 
 	private final HttpStatus httpStatus;
 	private final String code;
