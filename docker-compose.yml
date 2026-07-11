@@ -1,0 +1,22 @@
+services:
+  plogrid-redis:
+    image: redis:alpine
+    command: redis-server --notify-keyspace-events Ex
+    volumes:
+      - ./redis-data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      retries: 10
+    restart: unless-stopped
+
+  plogrid-server:
+    image: dlthwjd1629/plogrid:latest
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      plogrid-redis:
+        condition: service_healthy
+    restart: unless-stopped
