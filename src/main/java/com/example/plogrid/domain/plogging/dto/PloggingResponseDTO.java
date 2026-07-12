@@ -12,5 +12,6 @@ public class PloggingResponseDTO {
 	public static class TrashClassificationResponseDTO {
 
 		private YoloResponseDTO result;
+		private SpectralResponseDTO spectralResult;
 	}
 }

@@ -38,3 +38,6 @@ jwt:
 
 yolo:
   url: ${YOLO_URL}
+
+spectral:
+  url: ${SPECTRAL_URL}
