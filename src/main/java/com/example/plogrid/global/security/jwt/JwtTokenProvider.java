@@ -48,8 +48,8 @@ public class JwtTokenProvider {
 
 	// ── Access Token ──────────────────────────────────────────────
 
-	public String createAccessToken(Long memberId, String username) {
-		return buildToken(memberId, username, accessTokenExpiration);
+	public String createAccessToken(Long id, String username, TokenRole role) {
+		return buildToken(id, username, role, accessTokenExpiration);
 	}
 
 	public void blacklistToken(String token) {
@@ -70,33 +70,38 @@ public class JwtTokenProvider {
 
 	// ── Refresh Token ─────────────────────────────────────────────
 
-	public String createRefreshToken(Long memberId, String username) {
-		return buildToken(memberId, username, refreshTokenExpiration);
+	public String createRefreshToken(Long id, String username, TokenRole role) {
+		return buildToken(id, username, role, refreshTokenExpiration);
 	}
 
-	public void saveRefreshToken(Long memberId, String refreshToken) {
+	public void saveRefreshToken(Long id, TokenRole role, String refreshToken) {
 		redisTemplate.opsForValue().set(
-			REFRESH_PREFIX + memberId,
+			refreshKey(id, role),
 			refreshToken,
 			refreshTokenExpiration,
 			TimeUnit.MILLISECONDS
 		);
 	}
 
-	public String getRefreshToken(Long memberId) {
-		return redisTemplate.opsForValue().get(REFRESH_PREFIX + memberId);
+	public String getRefreshToken(Long id, TokenRole role) {
+		return redisTemplate.opsForValue().get(refreshKey(id, role));
 	}
 
-	public void deleteRefreshToken(Long memberId) {
-		redisTemplate.delete(REFRESH_PREFIX + memberId);
+	public void deleteRefreshToken(Long id, TokenRole role) {
+		redisTemplate.delete(refreshKey(id, role));
+	}
+
+	private String refreshKey(Long id, TokenRole role) {
+		return REFRESH_PREFIX + role.name() + ":" + id;
 	}
 
 	// ── 공통 ──────────────────────────────────────────────────────
 
-	private String buildToken(Long memberId, String username, long validityMs) {
+	private String buildToken(Long id, String username, TokenRole role, long validityMs) {
 		return Jwts.builder()
 			.subject(username)
-			.claim("id", memberId)
+			.claim("id", id)
+			.claim("role", role.name())
 			.issuedAt(new Date())
 			.expiration(new Date(System.currentTimeMillis() + validityMs))
 			.signWith(getSigningKey())
@@ -122,7 +127,8 @@ public class JwtTokenProvider {
 		MemberDetails principal = new MemberDetails(
 			claims.get("id", Long.class),
 			claims.getSubject(),
-			null
+			null,
+			TokenRole.valueOf(claims.get("role", String.class))
 		);
 		return new UsernamePasswordAuthenticationToken(principal, token, principal.getAuthorities());
 	}
@@ -134,6 +140,17 @@ public class JwtTokenProvider {
 			.parseSignedClaims(token)
 			.getPayload()
 			.get("id", Long.class);
+	}
+
+	public TokenRole getRoleFromToken(String token) {
+		return TokenRole.valueOf(
+			Jwts.parser()
+				.verifyWith(getSigningKey())
+				.build()
+				.parseSignedClaims(token)
+				.getPayload()
+				.get("role", String.class)
+		);
 	}
 
 	public long getRemainingValidity(String token) {

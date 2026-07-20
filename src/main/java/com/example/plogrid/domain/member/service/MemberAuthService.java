@@ -13,6 +13,7 @@ import com.example.plogrid.domain.member.repository.MemberStatisticsRepository;
 import com.example.plogrid.global.apiPayload.code.MemberErrorCode;
 import com.example.plogrid.global.apiPayload.exception.GeneralException;
 import com.example.plogrid.global.security.jwt.JwtTokenProvider;
+import com.example.plogrid.global.security.jwt.TokenRole;
 
 import lombok.RequiredArgsConstructor;
 
@@ -53,9 +54,9 @@ public class MemberAuthService {
 			throw new GeneralException(MemberErrorCode.INVALID_PASSWORD);
 		}
 
-		String accessToken = jwtTokenProvider.createAccessToken(member.getId(), member.getUsername());
-		String refreshToken = jwtTokenProvider.createRefreshToken(member.getId(), member.getUsername());
-		jwtTokenProvider.saveRefreshToken(member.getId(), refreshToken);
+		String accessToken = jwtTokenProvider.createAccessToken(member.getId(), member.getUsername(), TokenRole.MEMBER);
+		String refreshToken = jwtTokenProvider.createRefreshToken(member.getId(), member.getUsername(), TokenRole.MEMBER);
+		jwtTokenProvider.saveRefreshToken(member.getId(), TokenRole.MEMBER, refreshToken);
 
 		return MemberResponseDTO.Token.builder()
 			.accessToken(accessToken)
@@ -74,13 +75,13 @@ public class MemberAuthService {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new GeneralException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-		if (!refreshToken.equals(jwtTokenProvider.getRefreshToken(memberId))) {
+		if (!refreshToken.equals(jwtTokenProvider.getRefreshToken(memberId, TokenRole.MEMBER))) {
 			throw new GeneralException(MemberErrorCode.INVALID_REFRESH_TOKEN);
 		}
 
-		String newAccessToken = jwtTokenProvider.createAccessToken(member.getId(), member.getUsername());
-		String newRefreshToken = jwtTokenProvider.createRefreshToken(member.getId(), member.getUsername());
-		jwtTokenProvider.saveRefreshToken(member.getId(), newRefreshToken);
+		String newAccessToken = jwtTokenProvider.createAccessToken(member.getId(), member.getUsername(), TokenRole.MEMBER);
+		String newRefreshToken = jwtTokenProvider.createRefreshToken(member.getId(), member.getUsername(), TokenRole.MEMBER);
+		jwtTokenProvider.saveRefreshToken(member.getId(), TokenRole.MEMBER, newRefreshToken);
 
 		return MemberResponseDTO.Token.builder()
 			.accessToken(newAccessToken)
@@ -89,7 +90,7 @@ public class MemberAuthService {
 	}
 
 	public void signOut(Long memberId, String accessToken) {
-		jwtTokenProvider.deleteRefreshToken(memberId);
+		jwtTokenProvider.deleteRefreshToken(memberId, TokenRole.MEMBER);
 		jwtTokenProvider.blacklistToken(accessToken);
 	}
 
@@ -97,7 +98,7 @@ public class MemberAuthService {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new GeneralException(MemberErrorCode.MEMBER_NOT_FOUND));
 		jwtTokenProvider.blacklistToken(accessToken);
-		jwtTokenProvider.deleteRefreshToken(memberId);
+		jwtTokenProvider.deleteRefreshToken(memberId, TokenRole.MEMBER);
 		member.delete();
 	}
 }
