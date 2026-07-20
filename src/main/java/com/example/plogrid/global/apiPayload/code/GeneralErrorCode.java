@@ -24,7 +24,6 @@ public enum GeneralErrorCode implements BaseErrorCode {
 	REFRESH_TOKEN_REQUIRED(HttpStatus.UNAUTHORIZED, "AUTH401_6", "Refresh 토큰이 전달되지 않았습니다."),
 	REFRESH_TOKEN_MISMATCH(HttpStatus.UNAUTHORIZED, "AUTH401_7", "Refresh 토큰 정보가 일치하지 않습니다.");
 
-
 	private final HttpStatus httpStatus;
 	private final String code;
 	private final String message;
