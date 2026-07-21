@@ -6,6 +6,14 @@ import lombok.Getter;
 
 public class PloggingResponseDTO {
 
+	@Schema(name = "플로깅 시작 응답")
+	@Builder
+	@Getter
+	public static class StartResponseDTO {
+
+		private Long ploggingId;
+	}
+
 	@Schema(name = "쓰레기 분류 응답")
 	@Builder
 	@Getter

@@ -11,6 +11,7 @@ import com.example.plogrid.domain.plogging.dto.PloggingRequestDTO;
 import com.example.plogrid.domain.plogging.dto.PloggingResponseDTO;
 import com.example.plogrid.domain.plogging.service.PloggingCommandService;
 import com.example.plogrid.global.apiPayload.ApiResponse;
+import com.example.plogrid.global.security.handler.AuthUser;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +25,15 @@ import lombok.RequiredArgsConstructor;
 public class PloggingController {
 
 	private final PloggingCommandService ploggingCommandService;
+
+	@Operation(
+		summary = "플로깅 시작 API",
+		description = "회원이 플로깅 세션을 시작합니다."
+	)
+	@PostMapping
+	public ApiResponse<PloggingResponseDTO.StartResponseDTO> startPlogging(@AuthUser Long memberId) {
+		return ApiResponse.onSuccess(ploggingCommandService.startPlogging(memberId));
+	}
 
 	@Operation(
 		summary = "쓰레기 분석 API",
