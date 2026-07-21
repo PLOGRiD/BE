@@ -4,9 +4,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.example.plogrid.domain.member.entity.Member;
+import com.example.plogrid.global.security.jwt.TokenRole;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +20,15 @@ public class MemberDetails implements UserDetails {
 	private final Long id;
 	private final String username;
 	private final String password;
+	private final TokenRole role;
 
 	public static MemberDetails from(Member member) {
-		return new MemberDetails(member.getId(), member.getUsername(), member.getPassword());
+		return new MemberDetails(member.getId(), member.getUsername(), member.getPassword(), TokenRole.MEMBER);
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of();
+		return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
 	}
 
 	@Override
