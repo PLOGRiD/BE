@@ -2,9 +2,12 @@ package com.example.plogrid.domain.plogging.entity;
 
 import com.example.plogrid.domain.common.BaseEntity;
 import com.example.plogrid.domain.member.entity.Member;
+import com.example.plogrid.domain.plogging.entity.enums.PloggingStatus;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -38,11 +41,16 @@ public class Plogging extends BaseEntity {
 	@Column(name = "duration_seconds", nullable = false)
 	private double durationSeconds;
 
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private PloggingStatus status;
+
 	public static Plogging create(Member member) {
 		return Plogging.builder()
 			.member(member)
 			.distanceMeters(0)
 			.durationSeconds(0)
+			.status(PloggingStatus.IN_PROGRESS)
 			.build();
 	}
 }
