@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DeviceQueryService {
 
-	public final MemberDeviceRepository memberDeviceRepository;
+	private final MemberDeviceRepository memberDeviceRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtTokenProvider jwtTokenProvider;
 
