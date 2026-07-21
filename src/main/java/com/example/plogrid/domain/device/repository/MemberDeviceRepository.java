@@ -14,4 +14,8 @@ public interface MemberDeviceRepository extends JpaRepository<MemberCollectionDe
 		+ "join fetch mcd.collectionDevice "
 		+ "where mcd.collectionDevice.id = :collectionDeviceId")
 	Optional<MemberCollectionDevice> findByCollectionDeviceId(@Param("collectionDeviceId") Long collectionDeviceId);
+
+	boolean existsByCollectionDeviceId(Long collectionDeviceId);
+
+	boolean existsByMemberId(Long memberId);
 }

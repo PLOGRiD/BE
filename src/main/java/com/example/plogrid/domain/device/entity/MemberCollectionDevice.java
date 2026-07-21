@@ -13,6 +13,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,6 +22,8 @@ import lombok.NoArgsConstructor;
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "collection_device_id"}))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder(access = AccessLevel.PRIVATE)
 public class MemberCollectionDevice extends BaseEntity {
 
 	@Id
@@ -33,4 +37,11 @@ public class MemberCollectionDevice extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "collection_device_id", nullable = false)
 	private CollectionDevice collectionDevice;
+
+	public static MemberCollectionDevice create(Member member, CollectionDevice collectionDevice) {
+		return MemberCollectionDevice.builder()
+			.member(member)
+			.collectionDevice(collectionDevice)
+			.build();
+	}
 }

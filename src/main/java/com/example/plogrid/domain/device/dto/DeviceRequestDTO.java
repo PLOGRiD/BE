@@ -30,4 +30,14 @@ public class DeviceRequestDTO {
 		@NotNull(message = "값을 입력해주세요.")
 		private String refreshToken;
 	}
+
+	@Schema(name = "디바이스 연동 요청")
+	@Getter
+	@NoArgsConstructor
+	public static class LinkRequest {
+
+		@Schema(description = "수거 디바이스 ID", example = "12")
+		@NotNull(message = "값을 입력해주세요.")
+		private Long deviceId;
+	}
 }
