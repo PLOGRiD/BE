@@ -26,6 +26,7 @@ public class MemberQueryService {
 			.orElseThrow(() -> new GeneralException(MemberErrorCode.MEMBER_NOT_FOUND));
 
 		return MemberResponseDTO.MemberProfileDTO.builder()
+			.memberId(member.getId())
 			.nickName(member.getNickname())
 			.email(member.getEmail())
 			.build();

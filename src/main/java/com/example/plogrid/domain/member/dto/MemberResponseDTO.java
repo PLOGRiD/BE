@@ -23,6 +23,9 @@ public class MemberResponseDTO {
 	@Getter
 	public static class MemberProfileDTO {
 
+		@Schema(description = "사용자 ID", example = "1")
+		private Long memberId;
+
 		@Schema(description = "사용자 닉네임", example = "김나나")
 		private String nickName;
 
