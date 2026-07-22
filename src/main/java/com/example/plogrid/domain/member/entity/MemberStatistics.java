@@ -1,5 +1,8 @@
 package com.example.plogrid.domain.member.entity;
 
+import java.util.List;
+
+import com.example.plogrid.domain.trash.entity.enums.TrashCategory;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -33,6 +36,8 @@ public class MemberStatistics {
 
 	private double totalDistanceMeters;
 
+	private double totalDurationSeconds;
+
 	private int totalTrashCount;
 
 	private int contributionScore;
@@ -57,5 +62,26 @@ public class MemberStatistics {
 		return MemberStatistics.builder()
 			.member(member)
 			.build();
+	}
+
+	public void reflectPlogging(double distanceMeters, double durationSeconds, List<TrashCategory> categories, int contributionScore) {
+		this.ploggingCount += 1;
+		this.totalDistanceMeters += distanceMeters;
+		this.totalDurationSeconds += durationSeconds;
+		this.totalTrashCount += categories.size();
+		this.contributionScore += contributionScore;
+
+		for (TrashCategory category : categories) {
+			switch (category) {
+				case VINYL -> this.vinylCount++;
+				case GLASS -> this.glassCount++;
+				case PAPER -> this.paperCount++;
+				case CAN -> this.canCount++;
+				case PET_BOTTLE -> this.petCount++;
+				case PLASTIC -> this.plasticCount++;
+				case CIGARETTE -> this.cigaretteButtCount++;
+				default -> this.etcCount++;
+			}
+		}
 	}
 }
