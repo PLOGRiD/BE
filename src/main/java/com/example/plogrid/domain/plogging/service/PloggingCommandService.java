@@ -1,6 +1,8 @@
 package com.example.plogrid.domain.plogging.service;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
@@ -54,11 +56,18 @@ public class PloggingCommandService {
 		Plogging plogging = ploggingRepository.findByMemberIdAndStatus(memberId, PloggingStatus.IN_PROGRESS)
 			.orElseThrow(() -> new GeneralException(PloggingErrorCode.PLOGGING_NOT_IN_PROGRESS));
 
-		plogging.complete();
 		memberDeviceRepository.deleteByMemberId(memberId);
+
+		// TODO : 이동거리 계산 로직 미구현으로 임시 값 사용
+		double distanceMeters = 1500.0;
+		double durationSeconds = Duration.between(plogging.getCreatedAt(), LocalDateTime.now()).getSeconds();
+
+		plogging.complete();
 
 		return PloggingResponseDTO.EndResponseDTO.builder()
 			.ploggingId(plogging.getId())
+			.distanceMeters(distanceMeters)
+			.durationSeconds(durationSeconds)
 			.build();
 	}
 

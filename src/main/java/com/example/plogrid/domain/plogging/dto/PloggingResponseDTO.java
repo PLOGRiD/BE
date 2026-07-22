@@ -29,5 +29,7 @@ public class PloggingResponseDTO {
 	public static class EndResponseDTO {
 
 		private Long ploggingId;
+		private double distanceMeters;
+		private double durationSeconds;
 	}
 }
