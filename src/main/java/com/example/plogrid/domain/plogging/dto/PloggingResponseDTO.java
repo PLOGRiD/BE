@@ -22,4 +22,12 @@ public class PloggingResponseDTO {
 		private YoloResponseDTO result;
 		private SpectralResponseDTO spectralResult;
 	}
+
+	@Schema(name = "플로깅 종료 응답")
+	@Builder
+	@Getter
+	public static class EndResponseDTO {
+
+		private Long ploggingId;
+	}
 }

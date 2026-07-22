@@ -14,10 +14,12 @@ import com.example.plogrid.domain.plogging.dto.PloggingResponseDTO;
 import com.example.plogrid.domain.plogging.dto.SpectralResponseDTO;
 import com.example.plogrid.domain.plogging.dto.YoloResponseDTO;
 import com.example.plogrid.domain.plogging.entity.Plogging;
+import com.example.plogrid.domain.plogging.entity.enums.PloggingStatus;
 import com.example.plogrid.domain.plogging.repository.PloggingRepository;
 import com.example.plogrid.domain.trash.entity.enums.TrashSubCategory;
 import com.example.plogrid.global.apiPayload.code.DeviceErrorCode;
 import com.example.plogrid.global.apiPayload.code.MemberErrorCode;
+import com.example.plogrid.global.apiPayload.code.PloggingErrorCode;
 import com.example.plogrid.global.apiPayload.exception.GeneralException;
 
 import lombok.RequiredArgsConstructor;
@@ -44,6 +46,18 @@ public class PloggingCommandService {
 		Plogging plogging = ploggingRepository.save(Plogging.create(member));
 
 		return PloggingResponseDTO.StartResponseDTO.builder()
+			.ploggingId(plogging.getId())
+			.build();
+	}
+
+	public PloggingResponseDTO.EndResponseDTO endPlogging(Long memberId) {
+		Plogging plogging = ploggingRepository.findByMemberIdAndStatus(memberId, PloggingStatus.IN_PROGRESS)
+			.orElseThrow(() -> new GeneralException(PloggingErrorCode.PLOGGING_NOT_IN_PROGRESS));
+
+		plogging.complete();
+		memberDeviceRepository.deleteByMemberId(memberId);
+
+		return PloggingResponseDTO.EndResponseDTO.builder()
 			.ploggingId(plogging.getId())
 			.build();
 	}

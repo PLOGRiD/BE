@@ -53,4 +53,8 @@ public class Plogging extends BaseEntity {
 			.status(PloggingStatus.IN_PROGRESS)
 			.build();
 	}
+
+	public void complete() {
+		this.status = PloggingStatus.COMPLETED;
+	}
 }
