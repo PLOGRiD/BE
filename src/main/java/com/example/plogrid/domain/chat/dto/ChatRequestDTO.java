@@ -1,9 +1,12 @@
 package com.example.plogrid.domain.chat.dto;
 
+import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -25,5 +28,15 @@ public class ChatRequestDTO {
 
 		@Schema(description = "첨부 이미지 (최대 1장, 선택)", type = "string", format = "binary")
 		private MultipartFile image;
+	}
+
+	@Schema(name = "채팅 세션 삭제 요청")
+	@Getter
+	@NoArgsConstructor
+	public static class SessionDeleteRequest {
+
+		@Schema(description = "삭제할 채팅 세션 ID 목록", example = "[1, 2, 3]")
+		@NotEmpty(message = "삭제할 세션 ID를 1개 이상 입력해주세요.")
+		private List<Long> chatSessionIds;
 	}
 }

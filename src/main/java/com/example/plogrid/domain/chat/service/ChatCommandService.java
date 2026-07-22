@@ -1,5 +1,7 @@
 package com.example.plogrid.domain.chat.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,6 +54,14 @@ public class ChatCommandService {
 		return ChatConverter.toMessageResponse(chatSession, assistantLog);
 	}
 
+	public void deleteSessions(Long memberId, List<Long> chatSessionIds) {
+		List<ChatSession> chatSessions = chatSessionIds.stream()
+			.map(chatSessionId -> findOwnedSession(memberId, chatSessionId))
+			.toList();
+
+		chatSessionRepository.deleteAll(chatSessions);
+	}
+
 	private ChatSession resolveChatSession(Long memberId, Long chatSessionId, String firstMessage) {
 		if (chatSessionId == null) {
 			Member member = memberRepository.findById(memberId)
@@ -60,6 +70,10 @@ public class ChatCommandService {
 			return chatSessionRepository.save(ChatSession.create(member, generateSessionTitle(firstMessage)));
 		}
 
+		return findOwnedSession(memberId, chatSessionId);
+	}
+
+	private ChatSession findOwnedSession(Long memberId, Long chatSessionId) {
 		ChatSession chatSession = chatSessionRepository.findById(chatSessionId)
 			.orElseThrow(() -> new GeneralException(ChatErrorCode.CHAT_SESSION_NOT_FOUND));
 

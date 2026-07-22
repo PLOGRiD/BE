@@ -2,10 +2,12 @@ package com.example.plogrid.domain.chat.controller;
 
 import java.util.List;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -73,5 +75,22 @@ public class ChatController {
 	public ApiResponse<List<ChatResponseDTO.ChatLogResponse>> getMessages(
 		@AuthUser Long memberId, @PathVariable Long chatSessionId) {
 		return ApiResponse.onSuccess(chatQueryService.getMessages(memberId, chatSessionId));
+	}
+
+	@Operation(
+		summary = "채팅 세션 삭제 API",
+		description = """
+			선택한 채팅 세션들을 삭제합니다.
+
+			- 여러 세션 ID를 한 번에 넘겨 일괄 삭제할 수 있습니다.
+			- 세션에 속한 모든 채팅 로그가 함께 완전히 삭제되며, 복구할 수 없습니다.
+			- 하나라도 본인 소유의 세션이 아니거나 존재하지 않으면 전체 요청이 거절되고 아무 것도 삭제되지 않습니다.
+			"""
+	)
+	@DeleteMapping("/sessions")
+	public ApiResponse<Void> deleteSessions(
+		@AuthUser Long memberId, @Valid @RequestBody ChatRequestDTO.SessionDeleteRequest request) {
+		chatCommandService.deleteSessions(memberId, request.getChatSessionIds());
+		return ApiResponse.onSuccess(null);
 	}
 }
