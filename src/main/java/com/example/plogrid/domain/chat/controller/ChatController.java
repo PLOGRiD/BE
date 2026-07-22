@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -58,5 +59,19 @@ public class ChatController {
 	@GetMapping("/sessions")
 	public ApiResponse<List<ChatResponseDTO.SessionSummary>> getSessions(@AuthUser Long memberId) {
 		return ApiResponse.onSuccess(chatQueryService.getSessions(memberId));
+	}
+
+	@Operation(
+		summary = "채팅 세션 메시지 조회 API",
+		description = """
+			선택한 채팅 세션의 지난 메시지 목록을 오래된 순으로 조회합니다.
+
+			- 본인 소유의 세션이 아니거나 존재하지 않는 세션이면 거절됩니다.
+			"""
+	)
+	@GetMapping("/sessions/{chatSessionId}/messages")
+	public ApiResponse<List<ChatResponseDTO.ChatLogResponse>> getMessages(
+		@AuthUser Long memberId, @PathVariable Long chatSessionId) {
+		return ApiResponse.onSuccess(chatQueryService.getMessages(memberId, chatSessionId));
 	}
 }

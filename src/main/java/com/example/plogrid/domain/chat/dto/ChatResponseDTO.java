@@ -2,6 +2,7 @@ package com.example.plogrid.domain.chat.dto;
 
 import java.time.LocalDateTime;
 
+import com.example.plogrid.domain.chat.entity.enums.ChatRole;
 import com.example.plogrid.domain.chat.entity.enums.MessageType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -44,5 +45,29 @@ public class ChatResponseDTO {
 
 		@Schema(description = "마지막 메시지 시간 (당일: 오전/오후 h:mm, 어제, 그 외: N일전)", example = "오후 1:12")
 		private String lastMessageAt;
+	}
+
+	@Schema(name = "채팅 로그")
+	@Builder
+	@Getter
+	public static class ChatLogResponse {
+
+		@Schema(description = "채팅 로그 ID", example = "12")
+		private Long chatLogId;
+
+		@Schema(description = "발신자", example = "USER")
+		private ChatRole chatRole;
+
+		@Schema(description = "메시지 내용", example = "이 쓰레기는 어떻게 분리배출 해야 해?")
+		private String message;
+
+		@Schema(description = "첨부 이미지 URL", example = "https://dummy.plogrid.com/chat/trash.jpg")
+		private String imageUrl;
+
+		@Schema(description = "메시지 타입", example = "TEXT")
+		private MessageType messageType;
+
+		@Schema(description = "생성 시각", example = "2026-07-23T15:30:00")
+		private LocalDateTime createdAt;
 	}
 }

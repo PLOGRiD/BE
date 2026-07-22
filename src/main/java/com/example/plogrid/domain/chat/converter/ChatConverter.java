@@ -56,4 +56,17 @@ public class ChatConverter {
 
 		return daysBetween + "일전";
 	}
+
+	public static List<ChatResponseDTO.ChatLogResponse> toChatLogResponseList(List<ChatLog> chatLogs) {
+		return chatLogs.stream()
+			.map(chatLog -> ChatResponseDTO.ChatLogResponse.builder()
+				.chatLogId(chatLog.getId())
+				.chatRole(chatLog.getChatRole())
+				.message(chatLog.getChatContent())
+				.imageUrl(chatLog.getChatImageUrl())
+				.messageType(chatLog.getMessageType())
+				.createdAt(chatLog.getCreatedAt())
+				.build())
+			.toList();
+	}
 }
