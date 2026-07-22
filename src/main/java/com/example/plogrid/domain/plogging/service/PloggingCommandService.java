@@ -13,6 +13,7 @@ import com.example.plogrid.domain.device.repository.MemberDeviceRepository;
 import com.example.plogrid.domain.member.entity.Member;
 import com.example.plogrid.domain.member.repository.MemberRepository;
 import com.example.plogrid.domain.member.service.MemberStatisticsService;
+import com.example.plogrid.domain.plogging.converter.PloggingConverter;
 import com.example.plogrid.domain.plogging.dto.PloggingRequestDTO;
 import com.example.plogrid.domain.plogging.dto.PloggingResponseDTO;
 import com.example.plogrid.domain.plogging.dto.SpectralResponseDTO;
@@ -70,27 +71,6 @@ public class PloggingCommandService {
 		double durationSeconds = Duration.between(plogging.getCreatedAt(), LocalDateTime.now()).getSeconds();
 
 		List<Trash> trashes = trashRepository.findByPloggingId(plogging.getId());
-		int totalCount = trashes.size();
-
-		PloggingResponseDTO.TrashSummaryResponseDTO trashSummary = PloggingResponseDTO.TrashSummaryResponseDTO.builder()
-			.totalCount(totalCount)
-			.vinylPercentage(percentage(trashes, TrashCategory.VINYL, totalCount))
-			.paperPercentage(percentage(trashes, TrashCategory.PAPER, totalCount))
-			.glassPercentage(percentage(trashes, TrashCategory.GLASS, totalCount))
-			.canPercentage(percentage(trashes, TrashCategory.CAN, totalCount))
-			.petBottlePercentage(percentage(trashes, TrashCategory.PET_BOTTLE, totalCount))
-			.plasticPercentage(percentage(trashes, TrashCategory.PLASTIC, totalCount))
-			.cigarettePercentage(percentage(trashes, TrashCategory.CIGARETTE, totalCount))
-			.build();
-
-		List<PloggingResponseDTO.TrashResponseDTO> trashResponses = trashes.stream()
-			.map(trash -> PloggingResponseDTO.TrashResponseDTO.builder()
-				.trashId(trash.getId())
-				.category(trash.getCategory())
-				.imageUrl(trash.getTrashImage())
-				.build())
-			.toList();
-
 		int contributionScore = calculateContributionScore(trashes);
 
 		List<TrashCategory> categories = trashes.stream()
@@ -101,32 +81,13 @@ public class PloggingCommandService {
 
 		plogging.complete();
 
-		return PloggingResponseDTO.EndResponseDTO.builder()
-			.ploggingId(plogging.getId())
-			.distanceMeters(distanceMeters)
-			.durationSeconds(durationSeconds)
-			.contributionScore(contributionScore)
-			.trashSummary(trashSummary)
-			.trashes(trashResponses)
-			.build();
+		return PloggingConverter.toEndResponseDTO(plogging, distanceMeters, durationSeconds, contributionScore, trashes);
 	}
 
 	private int calculateContributionScore(List<Trash> trashes) {
 		return trashes.stream()
 			.mapToInt(trash -> trash.getCategory().getContributionWeight() * 10)
 			.sum();
-	}
-
-	private double percentage(List<Trash> trashes, TrashCategory category, int totalCount) {
-		if (totalCount == 0) {
-			return 0;
-		}
-
-		long count = trashes.stream()
-			.filter(trash -> trash.getCategory() == category)
-			.count();
-
-		return (double) count / totalCount * 100;
 	}
 
 	public PloggingResponseDTO.TrashClassificationResponseDTO trashClassification(
