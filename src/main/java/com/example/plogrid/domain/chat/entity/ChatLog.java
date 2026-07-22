@@ -15,12 +15,16 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder(access = AccessLevel.PRIVATE)
 public class ChatLog extends BaseEntity {
 
 	@Id
@@ -44,4 +48,14 @@ public class ChatLog extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "chat_session_id", nullable = false)
 	private ChatSession chatSession;
+
+	public static ChatLog create(ChatSession chatSession, String content, String imageUrl, ChatRole chatRole, MessageType messageType) {
+		return ChatLog.builder()
+			.chatSession(chatSession)
+			.ChatContent(content)
+			.chatImageUrl(imageUrl)
+			.chatRole(chatRole)
+			.messageType(messageType)
+			.build();
+	}
 }
