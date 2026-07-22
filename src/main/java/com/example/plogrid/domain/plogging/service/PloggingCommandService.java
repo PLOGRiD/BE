@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.plogrid.domain.device.repository.MemberDeviceRepository;
 import com.example.plogrid.domain.member.entity.Member;
 import com.example.plogrid.domain.member.repository.MemberRepository;
+import com.example.plogrid.domain.member.service.MemberStatisticsService;
 import com.example.plogrid.domain.plogging.dto.PloggingRequestDTO;
 import com.example.plogrid.domain.plogging.dto.PloggingResponseDTO;
 import com.example.plogrid.domain.plogging.dto.SpectralResponseDTO;
@@ -41,6 +42,7 @@ public class PloggingCommandService {
 	private final MemberRepository memberRepository;
 	private final MemberDeviceRepository memberDeviceRepository;
 	private final TrashRepository trashRepository;
+	private final MemberStatisticsService memberStatisticsService;
 
 	public PloggingResponseDTO.StartResponseDTO startPlogging(Long memberId) {
 		if (!memberDeviceRepository.existsByMemberId(memberId)) {
@@ -90,6 +92,12 @@ public class PloggingCommandService {
 			.toList();
 
 		int contributionScore = calculateContributionScore(trashes);
+
+		List<TrashCategory> categories = trashes.stream()
+			.map(Trash::getCategory)
+			.toList();
+
+		memberStatisticsService.reflectPloggingResult(memberId, distanceMeters, durationSeconds, categories, contributionScore);
 
 		plogging.complete();
 
