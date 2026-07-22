@@ -1,5 +1,9 @@
 package com.example.plogrid.domain.plogging.dto;
 
+import java.util.List;
+
+import com.example.plogrid.domain.trash.entity.enums.TrashCategory;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -31,5 +35,32 @@ public class PloggingResponseDTO {
 		private Long ploggingId;
 		private double distanceMeters;
 		private double durationSeconds;
+		private TrashSummaryResponseDTO trashSummary;
+		private List<TrashResponseDTO> trashes;
+	}
+
+	@Schema(name = "수거한 쓰레기 응답")
+	@Builder
+	@Getter
+	public static class TrashSummaryResponseDTO {
+
+		private int totalCount;
+		private double vinylPercentage;
+		private double paperPercentage;
+		private double glassPercentage;
+		private double canPercentage;
+		private double petBottlePercentage;
+		private double plasticPercentage;
+		private double cigarettePercentage;
+	}
+
+	@Schema(name = "수거한 쓰레기 개별 상세 응답")
+	@Builder
+	@Getter
+	public static class TrashResponseDTO {
+
+		private Long trashId;
+		private TrashCategory category;
+		private String imageUrl;
 	}
 }

@@ -3,6 +3,7 @@ package com.example.plogrid.domain.plogging.service;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Service;
@@ -18,7 +19,10 @@ import com.example.plogrid.domain.plogging.dto.YoloResponseDTO;
 import com.example.plogrid.domain.plogging.entity.Plogging;
 import com.example.plogrid.domain.plogging.entity.enums.PloggingStatus;
 import com.example.plogrid.domain.plogging.repository.PloggingRepository;
+import com.example.plogrid.domain.trash.entity.Trash;
+import com.example.plogrid.domain.trash.entity.enums.TrashCategory;
 import com.example.plogrid.domain.trash.entity.enums.TrashSubCategory;
+import com.example.plogrid.domain.trash.repository.TrashRepository;
 import com.example.plogrid.global.apiPayload.code.DeviceErrorCode;
 import com.example.plogrid.global.apiPayload.code.MemberErrorCode;
 import com.example.plogrid.global.apiPayload.code.PloggingErrorCode;
@@ -36,6 +40,7 @@ public class PloggingCommandService {
 	private final PloggingRepository ploggingRepository;
 	private final MemberRepository memberRepository;
 	private final MemberDeviceRepository memberDeviceRepository;
+	private final TrashRepository trashRepository;
 
 	public PloggingResponseDTO.StartResponseDTO startPlogging(Long memberId) {
 		if (!memberDeviceRepository.existsByMemberId(memberId)) {
@@ -62,13 +67,49 @@ public class PloggingCommandService {
 		double distanceMeters = 1500.0;
 		double durationSeconds = Duration.between(plogging.getCreatedAt(), LocalDateTime.now()).getSeconds();
 
+		List<Trash> trashes = trashRepository.findByPloggingId(plogging.getId());
+		int totalCount = trashes.size();
+
+		PloggingResponseDTO.TrashSummaryResponseDTO trashSummary = PloggingResponseDTO.TrashSummaryResponseDTO.builder()
+			.totalCount(totalCount)
+			.vinylPercentage(percentage(trashes, TrashCategory.VINYL, totalCount))
+			.paperPercentage(percentage(trashes, TrashCategory.PAPER, totalCount))
+			.glassPercentage(percentage(trashes, TrashCategory.GLASS, totalCount))
+			.canPercentage(percentage(trashes, TrashCategory.CAN, totalCount))
+			.petBottlePercentage(percentage(trashes, TrashCategory.PET_BOTTLE, totalCount))
+			.plasticPercentage(percentage(trashes, TrashCategory.PLASTIC, totalCount))
+			.cigarettePercentage(percentage(trashes, TrashCategory.CIGARETTE, totalCount))
+			.build();
+
+		List<PloggingResponseDTO.TrashResponseDTO> trashResponses = trashes.stream()
+			.map(trash -> PloggingResponseDTO.TrashResponseDTO.builder()
+				.trashId(trash.getId())
+				.category(trash.getCategory())
+				.imageUrl(trash.getTrashImage())
+				.build())
+			.toList();
+
 		plogging.complete();
 
 		return PloggingResponseDTO.EndResponseDTO.builder()
 			.ploggingId(plogging.getId())
 			.distanceMeters(distanceMeters)
 			.durationSeconds(durationSeconds)
+			.trashSummary(trashSummary)
+			.trashes(trashResponses)
 			.build();
+	}
+
+	private double percentage(List<Trash> trashes, TrashCategory category, int totalCount) {
+		if (totalCount == 0) {
+			return 0;
+		}
+
+		long count = trashes.stream()
+			.filter(trash -> trash.getCategory() == category)
+			.count();
+
+		return (double) count / totalCount * 100;
 	}
 
 	public PloggingResponseDTO.TrashClassificationResponseDTO trashClassification(
