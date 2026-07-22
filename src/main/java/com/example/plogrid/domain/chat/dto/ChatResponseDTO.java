@@ -30,4 +30,19 @@ public class ChatResponseDTO {
 		@Schema(description = "생성 시각", example = "2026-07-23T15:30:00")
 		private LocalDateTime createdAt;
 	}
+
+	@Schema(name = "채팅 세션 요약")
+	@Builder
+	@Getter
+	public static class SessionSummary {
+
+		@Schema(description = "채팅 세션 ID", example = "1")
+		private Long chatSessionId;
+
+		@Schema(description = "채팅 세션 제목", example = "이 쓰레기는 어떻게 분리배출...")
+		private String sessionTitle;
+
+		@Schema(description = "마지막 메시지 시간 (당일: 오전/오후 h:mm, 어제, 그 외: N일전)", example = "오후 1:12")
+		private String lastMessageAt;
+	}
 }

@@ -47,6 +47,8 @@ public class ChatCommandService {
 		ChatLog assistantLog = chatLogRepository.save(
 			ChatLog.create(chatSession, answer, null, ChatRole.ASSISTANT, MessageType.TEXT));
 
+		chatSession.updateLastMessageAt(assistantLog.getCreatedAt());
+
 		return ChatConverter.toMessageResponse(chatSession, assistantLog);
 	}
 
@@ -62,7 +64,6 @@ public class ChatCommandService {
 			.orElseThrow(() -> new GeneralException(ChatErrorCode.CHAT_SESSION_NOT_FOUND));
 
 		if (!chatSession.getMember().getId().equals(memberId)) {
-			// 세션 존재 여부를 노출하지 않기 위해 소유자가 아닌 경우에도 동일하게 404 처리
 			throw new GeneralException(ChatErrorCode.CHAT_SESSION_NOT_FOUND);
 		}
 

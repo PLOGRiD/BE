@@ -1,5 +1,6 @@
 package com.example.plogrid.domain.chat.entity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +39,8 @@ public class ChatSession extends BaseEntity {
 
 	private String sessionTitle;
 
+	private LocalDateTime lastMessageAt;
+
 	@Builder.Default
 	@OneToMany(mappedBy = "chatSession", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ChatLog> chatLogs = new ArrayList<>();
@@ -47,5 +50,9 @@ public class ChatSession extends BaseEntity {
 			.member(member)
 			.sessionTitle(sessionTitle)
 			.build();
+	}
+
+	public void updateLastMessageAt(LocalDateTime lastMessageAt) {
+		this.lastMessageAt = lastMessageAt;
 	}
 }
