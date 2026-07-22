@@ -44,6 +44,9 @@ public class MemberResponseDTO {
 		@Schema(description = "총 이동 거리 (미터)", example = "15230.5")
 		private double totalDistanceMeters;
 
+		@Schema(description = "총 진행 시간 (초)", example = "18320.0")
+		private double totalDurationSeconds;
+
 		@Schema(description = "총 쓰레기 수거량 (개)", example = "48")
 		private int totalTrashCount;
 

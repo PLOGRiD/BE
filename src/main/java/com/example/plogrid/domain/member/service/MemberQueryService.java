@@ -50,6 +50,7 @@ public class MemberQueryService {
 		return MemberResponseDTO.MemberContributionDTO.builder()
 			.ploggingCount(statistics.getPloggingCount())
 			.totalDistanceMeters(statistics.getTotalDistanceMeters())
+			.totalDurationSeconds(statistics.getTotalDurationSeconds())
 			.totalTrashCount(statistics.getTotalTrashCount())
 			.contributionScore(statistics.getContributionScore())
 			.trashCategory(trashCategory)
