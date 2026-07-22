@@ -89,15 +89,24 @@ public class PloggingCommandService {
 				.build())
 			.toList();
 
+		int contributionScore = calculateContributionScore(trashes);
+
 		plogging.complete();
 
 		return PloggingResponseDTO.EndResponseDTO.builder()
 			.ploggingId(plogging.getId())
 			.distanceMeters(distanceMeters)
 			.durationSeconds(durationSeconds)
+			.contributionScore(contributionScore)
 			.trashSummary(trashSummary)
 			.trashes(trashResponses)
 			.build();
+	}
+
+	private int calculateContributionScore(List<Trash> trashes) {
+		return trashes.stream()
+			.mapToInt(trash -> trash.getCategory().getContributionWeight() * 10)
+			.sum();
 	}
 
 	private double percentage(List<Trash> trashes, TrashCategory category, int totalCount) {

@@ -35,6 +35,7 @@ public class PloggingResponseDTO {
 		private Long ploggingId;
 		private double distanceMeters;
 		private double durationSeconds;
+		private int contributionScore;
 		private TrashSummaryResponseDTO trashSummary;
 		private List<TrashResponseDTO> trashes;
 	}
