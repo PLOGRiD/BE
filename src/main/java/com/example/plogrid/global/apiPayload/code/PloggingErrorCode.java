@@ -11,7 +11,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum PloggingErrorCode implements BaseErrorCode {
 
-	PLOGGING_NOT_IN_PROGRESS(HttpStatus.NOT_FOUND, "PLOGGING404_1", "진행 중인 플로깅이 없습니다.");
+	PLOGGING_NOT_IN_PROGRESS(HttpStatus.NOT_FOUND, "PLOGGING404_1", "진행 중인 플로깅이 없습니다."),
+	PLOGGING_NOT_FOUND(HttpStatus.NOT_FOUND, "PLOGGING404_2", "플로깅 기록이 없습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;

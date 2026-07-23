@@ -9,4 +9,6 @@ import com.example.plogrid.domain.trash.entity.Trash;
 public interface TrashRepository extends JpaRepository<Trash, Long> {
 
 	List<Trash> findByPloggingId(Long ploggingId);
+
+	int countByPloggingId(Long ploggingId);
 }

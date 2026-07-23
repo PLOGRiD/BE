@@ -79,7 +79,7 @@ public class PloggingCommandService {
 
 		memberStatisticsService.reflectPloggingResult(memberId, distanceMeters, durationSeconds, categories, contributionScore);
 
-		plogging.complete();
+		plogging.complete(distanceMeters, durationSeconds);
 
 		return PloggingConverter.toEndResponseDTO(plogging, distanceMeters, durationSeconds, contributionScore, trashes);
 	}

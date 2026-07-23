@@ -54,7 +54,9 @@ public class Plogging extends BaseEntity {
 			.build();
 	}
 
-	public void complete() {
+	public void complete(double distanceMeters, double durationSeconds) {
 		this.status = PloggingStatus.COMPLETED;
+		this.distanceMeters = distanceMeters;
+		this.durationSeconds = durationSeconds;
 	}
 }

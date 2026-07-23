@@ -64,4 +64,15 @@ public class PloggingResponseDTO {
 		private TrashCategory category;
 		private String imageUrl;
 	}
+
+	@Schema(name = "가장 최근 플로깅 기록 응답")
+	@Builder
+	@Getter
+	public static class RecentResponseDTO {
+
+		private Long ploggingId;
+		private double distanceMeters;
+		private double durationSeconds;
+		private int trashCount;
+	}
 }

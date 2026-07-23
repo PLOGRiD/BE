@@ -50,6 +50,15 @@ public class PloggingConverter {
 			.toList();
 	}
 
+	public static PloggingResponseDTO.RecentResponseDTO toRecentResponseDTO(Plogging plogging, int trashCount) {
+		return PloggingResponseDTO.RecentResponseDTO.builder()
+			.ploggingId(plogging.getId())
+			.distanceMeters(plogging.getDistanceMeters())
+			.durationSeconds(plogging.getDurationSeconds())
+			.trashCount(trashCount)
+			.build();
+	}
+
 	private static double percentage(List<Trash> trashes, TrashCategory category, int totalCount) {
 		if (totalCount == 0) {
 			return 0;

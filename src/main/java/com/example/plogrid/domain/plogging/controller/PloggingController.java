@@ -2,6 +2,7 @@ package com.example.plogrid.domain.plogging.controller;
 
 import java.io.IOException;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.plogrid.domain.plogging.dto.PloggingRequestDTO;
 import com.example.plogrid.domain.plogging.dto.PloggingResponseDTO;
 import com.example.plogrid.domain.plogging.service.PloggingCommandService;
+import com.example.plogrid.domain.plogging.service.PloggingQueryService;
 import com.example.plogrid.global.apiPayload.ApiResponse;
 import com.example.plogrid.global.security.handler.AuthUser;
 
@@ -26,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class PloggingController {
 
 	private final PloggingCommandService ploggingCommandService;
+	private final PloggingQueryService ploggingQueryService;
 
 	@Operation(
 		summary = "플로깅 시작 API",
@@ -66,5 +69,19 @@ public class PloggingController {
 	public ApiResponse<PloggingResponseDTO.TrashClassificationResponseDTO> trashClassification(
 		@Valid @ModelAttribute PloggingRequestDTO.WasteClassification request) throws IOException {
 		return ApiResponse.onSuccess(ploggingCommandService.trashClassification(request));
+	}
+
+	@Operation(
+		summary = "가장 최근 플로깅 기록 조회 API",
+		description = """
+			현재 로그인한 회원의 가장 최근에 완료된 플로깅 기록을 조회합니다.
+
+			- 완료된 플로깅 기록이 없으면 404(PLOGGING404_2, 플로깅 기록이 없습니다)로 거절됩니다.
+			- 이동 거리(m), 진행 시간(초), 수거한 쓰레기 개수를 반환합니다.
+			"""
+	)
+	@GetMapping("/recent")
+	public ApiResponse<PloggingResponseDTO.RecentResponseDTO> getRecentPlogging(@AuthUser Long memberId) {
+		return ApiResponse.onSuccess(ploggingQueryService.getRecentPlogging(memberId));
 	}
 }
