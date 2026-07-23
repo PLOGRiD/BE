@@ -28,8 +28,6 @@ public class SecurityConfig {
 		"/api/v1/device/reissue",
 		"/api/v1/plogging/waste-classification",
 		"/api/v1/common/health/**",
-		"/api/v1/test/**", // TODO: S3 업로드 인프라 검증용 임시 허용, 검증 끝나면 제거
-
 		"/swagger-ui/**",
 		"/swagger-resources/**",
 		"/v3/api-docs/**",
