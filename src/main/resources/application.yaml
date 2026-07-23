@@ -36,6 +36,12 @@ jwt:
       access: 3600000
       refresh: 1209600000
 
+cloud:
+  aws:
+    region: ${AWS_REGION:ap-south-1}
+    s3:
+      bucket: ${AWS_S3_BUCKET}
+
 yolo:
   url: ${YOLO_URL}
 

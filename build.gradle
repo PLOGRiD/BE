@@ -17,7 +17,20 @@ repositories {
 	mavenCentral()
 }
 
+ext {
+	awsSdkVersion = '2.46.6'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "software.amazon.awssdk:bom:${awsSdkVersion}"
+	}
+}
+
 dependencies {
+	// AWS S3
+	implementation 'software.amazon.awssdk:s3'
+
 	// Spring Boot
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
