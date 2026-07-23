@@ -27,7 +27,7 @@ public class SecurityConfig {
 		"/api/v1/device/token",
 		"/api/v1/device/reissue",
 		"/api/v1/plogging/waste-classification",
-		"/api/v1/common/health/**",
+		"/api/v1/health",
 		"/swagger-ui/**",
 		"/swagger-resources/**",
 		"/v3/api-docs/**",
