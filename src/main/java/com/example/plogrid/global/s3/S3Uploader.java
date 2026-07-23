@@ -13,7 +13,9 @@ import com.example.plogrid.global.apiPayload.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Component
 @RequiredArgsConstructor
@@ -38,6 +40,29 @@ public class S3Uploader {
 		return upload(file, TRASH_IMAGE_DIR);
 	}
 
+	public void deleteImage(String imageUrl) {
+		String key = extractKey(imageUrl);
+
+		try {
+			s3Client.deleteObject(
+				DeleteObjectRequest.builder()
+					.bucket(bucket)
+					.key(key)
+					.build()
+			);
+		} catch (S3Exception e) {
+			throw new GeneralException(S3ErrorCode.S3_DELETE_FAILED);
+		}
+	}
+
+	private String extractKey(String imageUrl) {
+		String prefix = urlPrefix();
+		if (imageUrl == null || !imageUrl.startsWith(prefix)) {
+			throw new GeneralException(S3ErrorCode.S3_INVALID_URL);
+		}
+		return imageUrl.substring(prefix.length());
+	}
+
 	private String upload(MultipartFile file, String dirName) {
 		if (file == null || file.isEmpty()) {
 			throw new GeneralException(S3ErrorCode.S3_FILE_EMPTY);
@@ -58,7 +83,11 @@ public class S3Uploader {
 			throw new GeneralException(S3ErrorCode.S3_UPLOAD_FAILED);
 		}
 
-		return "https://%s.s3.%s.amazonaws.com/%s".formatted(bucket, region, key);
+		return urlPrefix() + key;
+	}
+
+	private String urlPrefix() {
+		return "https://%s.s3.%s.amazonaws.com/".formatted(bucket, region);
 	}
 
 	private String extractExtension(String filename) {
