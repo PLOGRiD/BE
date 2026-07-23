@@ -1,6 +1,7 @@
 package com.example.plogrid.domain.chat.service;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import com.example.plogrid.domain.member.repository.MemberRepository;
 import com.example.plogrid.global.apiPayload.code.ChatErrorCode;
 import com.example.plogrid.global.apiPayload.code.MemberErrorCode;
 import com.example.plogrid.global.apiPayload.exception.GeneralException;
+import com.example.plogrid.global.s3.S3Uploader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,6 +36,7 @@ public class ChatCommandService {
 	private final ChatSessionRepository chatSessionRepository;
 	private final ChatLogRepository chatLogRepository;
 	private final MemberRepository memberRepository;
+	private final S3Uploader s3Uploader;
 
 	public ChatResponseDTO.MessageResponse chat(Long memberId, ChatRequestDTO.MessageRequest request) {
 		ChatSession chatSession = resolveChatSession(memberId, request.getChatSessionId(), request.getMessage());
@@ -58,6 +61,12 @@ public class ChatCommandService {
 		List<ChatSession> chatSessions = chatSessionIds.stream()
 			.map(chatSessionId -> findOwnedSession(memberId, chatSessionId))
 			.toList();
+
+		chatSessions.stream()
+			.flatMap(chatSession -> chatSession.getChatLogs().stream())
+			.map(ChatLog::getChatImageUrl)
+			.filter(Objects::nonNull)
+			.forEach(s3Uploader::deleteImage);
 
 		chatSessionRepository.deleteAll(chatSessions);
 	}
@@ -89,8 +98,7 @@ public class ChatCommandService {
 			return null;
 		}
 
-		// TODO: 실제 이미지 스토리지(S3 등) 연동 전까지 더미 URL 사용
-		return "https://dummy.plogrid.com/chat/" + image.getOriginalFilename();
+		return s3Uploader.uploadChatImage(image);
 	}
 
 	private String generateSessionTitle(String message) {
