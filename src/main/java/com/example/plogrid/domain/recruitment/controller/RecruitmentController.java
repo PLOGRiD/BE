@@ -1,6 +1,7 @@
 package com.example.plogrid.domain.recruitment.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,6 +38,21 @@ public class RecruitmentController {
 		@RequestParam(name = "size", defaultValue = "10") @Min(1) Integer size
 	) {
 		return ApiResponse.onSuccess(recruitmentQueryService.getRecruitmentList(page, size));
+	}
+
+	@Operation(
+		summary = "모집글 상세 조회 API",
+		description = """
+        모집글 ID로 단체 플로깅 모집글 상세 정보를 조회합니다.
+        Parameter:
+        - `recruitmentId`: 모집글 ID
+    """
+	)
+	@GetMapping("/{recruitmentId}")
+	public ApiResponse<RecruitmentResponseDTO.RecruitmentDetailResponseDTO> getRecruitmentDetail(
+		@PathVariable Long recruitmentId
+	) {
+		return ApiResponse.onSuccess(recruitmentQueryService.getRecruitmentDetail(recruitmentId));
 	}
 
 }

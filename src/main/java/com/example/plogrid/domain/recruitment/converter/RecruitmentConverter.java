@@ -39,4 +39,19 @@ public class RecruitmentConverter {
 			.eventStatus(recruitment.getStatus())
 			.build();
 	}
+
+	public static RecruitmentResponseDTO.RecruitmentDetailResponseDTO toRecruitmentDetailResponseDTO(
+		Recruitment recruitment, int currentParticipants) {
+		return RecruitmentResponseDTO.RecruitmentDetailResponseDTO.builder()
+			.title(recruitment.getTitle())
+			.hostName(recruitment.getHost().getName())
+			.thumbnailImageUrl(recruitment.getThumbnailImageUrl())
+			.description(recruitment.getDescription())
+			.eventDateTime(recruitment.getEventDateTime())
+			.eventLocation(recruitment.getEventLocation())
+			.currentParticipants(currentParticipants)
+			.maxParticipants(recruitment.getMaxParticipants())
+			.eventStatus(recruitment.getStatus())
+			.build();
+	}
 }

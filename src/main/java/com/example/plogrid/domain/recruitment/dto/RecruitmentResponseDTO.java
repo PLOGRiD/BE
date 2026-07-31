@@ -35,4 +35,19 @@ public class RecruitmentResponseDTO {
 		private Integer maxParticipants;
 		private RecruitmentStatus eventStatus;
 	}
+
+	@Schema(name = "모집글 상세 응답")
+	@Builder
+	@Getter
+	public static class RecruitmentDetailResponseDTO {
+		private String title;
+		private String hostName;
+		private String thumbnailImageUrl;
+		private String description;
+		private LocalDateTime eventDateTime;
+		private String eventLocation;
+		private Integer currentParticipants;
+		private Integer maxParticipants;
+		private RecruitmentStatus eventStatus;
+	}
 }

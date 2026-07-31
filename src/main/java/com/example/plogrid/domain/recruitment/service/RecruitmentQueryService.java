@@ -13,6 +13,8 @@ import com.example.plogrid.domain.recruitment.dto.RecruitmentResponseDTO;
 import com.example.plogrid.domain.recruitment.entity.Recruitment;
 import com.example.plogrid.domain.recruitment.repository.RecruitmentParticipantRepository;
 import com.example.plogrid.domain.recruitment.repository.RecruitmentRepository;
+import com.example.plogrid.global.apiPayload.code.RecruitmentErrorCode;
+import com.example.plogrid.global.apiPayload.exception.GeneralException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,5 +35,14 @@ public class RecruitmentQueryService {
 				recruitment -> recruitmentParticipantRepository.countByRecruitmentId(recruitment.getId())));
 
 		return RecruitmentConverter.toRecruitmentListResponseDTO(recruitments, currentParticipantCounts);
+	}
+
+	public RecruitmentResponseDTO.RecruitmentDetailResponseDTO getRecruitmentDetail(Long recruitmentId) {
+		Recruitment recruitment = recruitmentRepository.findById(recruitmentId)
+			.orElseThrow(() -> new GeneralException(RecruitmentErrorCode.RECRUITMENT_NOT_FOUND));
+
+		int currentParticipants = recruitmentParticipantRepository.countByRecruitmentId(recruitmentId);
+
+		return RecruitmentConverter.toRecruitmentDetailResponseDTO(recruitment, currentParticipants);
 	}
 }
