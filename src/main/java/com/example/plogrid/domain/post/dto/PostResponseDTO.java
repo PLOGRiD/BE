@@ -32,4 +32,12 @@ public class PostResponseDTO {
 		private List<String> imageUrls;
 		private int likeCount;
 	}
+
+	@Schema(name = "좋아요 토글 응답")
+	@Builder
+	@Getter
+	public static class LikeToggleResponseDTO {
+		private Boolean isLiked;
+		private Integer likeCount;
+	}
 }

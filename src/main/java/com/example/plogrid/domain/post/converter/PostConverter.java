@@ -41,4 +41,11 @@ public class PostConverter {
 			.likeCount(likeCount)
 			.build();
 	}
+
+	public static PostResponseDTO.LikeToggleResponseDTO toLikeToggleResponseDTO(boolean isLiked, int likeCount) {
+		return PostResponseDTO.LikeToggleResponseDTO.builder()
+			.isLiked(isLiked)
+			.likeCount(likeCount)
+			.build();
+	}
 }
