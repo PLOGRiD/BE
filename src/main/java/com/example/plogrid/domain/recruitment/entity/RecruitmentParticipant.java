@@ -1,4 +1,4 @@
-package com.example.plogrid.domain.post.entity;
+package com.example.plogrid.domain.recruitment.entity;
 
 import com.example.plogrid.domain.common.BaseEntity;
 import com.example.plogrid.domain.member.entity.Member;
@@ -19,15 +19,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(
-	name = "likes",
-	uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "post_id"})
-)
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "recruitment_id"}))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder(access = AccessLevel.PRIVATE)
-public class Like extends BaseEntity {
+public class RecruitmentParticipant extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,13 +35,13 @@ public class Like extends BaseEntity {
 	private Member member;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "post_id", nullable = false)
-	private Post post;
+	@JoinColumn(name = "recruitment_id", nullable = false)
+	private Recruitment recruitment;
 
-	public static Like create(Member member, Post post) {
-		return Like.builder()
+	public static RecruitmentParticipant create(Member member, Recruitment recruitment) {
+		return RecruitmentParticipant.builder()
 			.member(member)
-			.post(post)
+			.recruitment(recruitment)
 			.build();
 	}
 }
