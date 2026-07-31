@@ -54,4 +54,13 @@ public class RecruitmentConverter {
 			.eventStatus(recruitment.getStatus())
 			.build();
 	}
+
+	public static RecruitmentResponseDTO.ParticipationToggleResponseDTO toParticipationToggleResponseDTO(
+		boolean isParticipating, int currentParticipants, int maxParticipants) {
+		return RecruitmentResponseDTO.ParticipationToggleResponseDTO.builder()
+			.isParticipating(isParticipating)
+			.currentParticipants(currentParticipants)
+			.maxParticipants(maxParticipants)
+			.build();
+	}
 }

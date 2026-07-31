@@ -2,13 +2,16 @@ package com.example.plogrid.domain.recruitment.controller;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.plogrid.domain.recruitment.dto.RecruitmentResponseDTO;
+import com.example.plogrid.domain.recruitment.service.RecruitmentCommandService;
 import com.example.plogrid.domain.recruitment.service.RecruitmentQueryService;
 import com.example.plogrid.global.apiPayload.ApiResponse;
+import com.example.plogrid.global.security.handler.AuthUser;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 public class RecruitmentController {
 
 	private final RecruitmentQueryService recruitmentQueryService;
+	private final RecruitmentCommandService recruitmentCommandService;
 
 	@Operation(
 		summary = "모집글 목록 조회 API",
@@ -53,6 +57,23 @@ public class RecruitmentController {
 		@PathVariable Long recruitmentId
 	) {
 		return ApiResponse.onSuccess(recruitmentQueryService.getRecruitmentDetail(recruitmentId));
+	}
+
+	@Operation(
+		summary = "모집글 참여 토글 API",
+		description = """
+        단체 플로깅 모집글에 대한 참여를 신청/취소합니다.
+        이미 참여한 상태라면 취소되고, 참여하지 않은 상태라면 신청됩니다.
+        Parameter:
+        - `recruitmentId`: 모집글 ID
+    """
+	)
+	@PostMapping("/{recruitmentId}/participation")
+	public ApiResponse<RecruitmentResponseDTO.ParticipationToggleResponseDTO> toggleParticipation(
+		@AuthUser Long memberId,
+		@PathVariable Long recruitmentId
+	) {
+		return ApiResponse.onSuccess(recruitmentCommandService.toggleParticipation(memberId, recruitmentId));
 	}
 
 }

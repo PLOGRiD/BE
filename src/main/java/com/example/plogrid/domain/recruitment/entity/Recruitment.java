@@ -50,6 +50,9 @@ public class Recruitment extends BaseEntity {
 	@Column(nullable = false)
 	private Integer maxParticipants;
 
+	@Column(nullable = false)
+	private Integer currentParticipants;
+
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "host_id", nullable = false)
 	private Host host;

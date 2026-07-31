@@ -50,4 +50,13 @@ public class RecruitmentResponseDTO {
 		private Integer maxParticipants;
 		private RecruitmentStatus eventStatus;
 	}
+
+	@Schema(name = "모집 참여 토글 응답")
+	@Builder
+	@Getter
+	public static class ParticipationToggleResponseDTO {
+		private Boolean isParticipating;
+		private Integer currentParticipants;
+		private Integer maxParticipants;
+	}
 }
