@@ -46,4 +46,17 @@ public class MemberController {
 	public ApiResponse<MemberResponseDTO.MemberContributionDTO> getMyContribution(@AuthUser Long memberId) {
 		return ApiResponse.onSuccess(memberQueryService.getMyContribution(memberId));
 	}
+
+	@Operation(
+		summary = "환경 기여도 랭킹 조회 API",
+		description = """
+			환경 기여도 점수 기준 상위 10위 랭킹과 로그인한 회원의 랭킹을 조회합니다.
+
+			- `Authorization: Bearer {accessToken}` 헤더가 필요합니다.
+			"""
+	)
+	@GetMapping("/ranking")
+	public ApiResponse<MemberResponseDTO.MemberRankingResultDTO> getRanking(@AuthUser Long memberId) {
+		return ApiResponse.onSuccess(memberQueryService.getRanking(memberId));
+	}
 }

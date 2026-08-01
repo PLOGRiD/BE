@@ -1,5 +1,9 @@
 package com.example.plogrid.domain.member.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +58,37 @@ public class MemberQueryService {
 			.totalTrashCount(statistics.getTotalTrashCount())
 			.contributionScore(statistics.getContributionScore())
 			.trashCategory(trashCategory)
+			.build();
+	}
+
+	public MemberResponseDTO.MemberRankingResultDTO getRanking(Long memberId) {
+		List<MemberStatistics> topStatistics = memberStatisticsRepository
+			.findRankingsOrderByContributionScoreDesc(PageRequest.of(0, 10));
+
+		List<MemberResponseDTO.MemberRankingDTO> topRankings = new ArrayList<>();
+		int rank = 1;
+		for (MemberStatistics statistics : topStatistics) {
+			topRankings.add(toRankingDTO(rank++, statistics));
+		}
+
+		MemberStatistics myStatistics = memberStatisticsRepository.findByMemberId(memberId)
+			.orElseThrow(() -> new GeneralException(MemberErrorCode.STATISTICS_NOT_FOUND));
+
+		int myRank = (int) memberStatisticsRepository
+			.countByContributionScoreGreaterThan(myStatistics.getContributionScore()) + 1;
+
+		return MemberResponseDTO.MemberRankingResultDTO.builder()
+			.topRankings(topRankings)
+			.myRanking(toRankingDTO(myRank, myStatistics))
+			.build();
+	}
+
+	private MemberResponseDTO.MemberRankingDTO toRankingDTO(int rank, MemberStatistics statistics) {
+		return MemberResponseDTO.MemberRankingDTO.builder()
+			.rank(rank)
+			.memberId(statistics.getMember().getId())
+			.nickName(statistics.getMember().getNickname())
+			.contributionScore(statistics.getContributionScore())
 			.build();
 	}
 }
