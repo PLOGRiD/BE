@@ -33,4 +33,10 @@ public class TrashQueryService {
 		List<Trash> trashes = trashRepository.findWithinViewport(minLat, maxLat, minLng, maxLng, maxViewportResultSize);
 		return TrashConverter.toTrashMapResponseDTOList(trashes);
 	}
+
+	public TrashResponseDTO.TrashMapResponseDTO getTrashDetail(Long trashId) {
+		Trash trash = trashRepository.findById(trashId)
+			.orElseThrow(() -> new GeneralException(TrashErrorCode.TRASH_NOT_FOUND));
+		return TrashConverter.toTrashMapResponseDTO(trash);
+	}
 }

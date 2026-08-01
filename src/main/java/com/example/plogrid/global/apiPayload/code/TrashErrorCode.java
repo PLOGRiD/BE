@@ -11,7 +11,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum TrashErrorCode implements BaseErrorCode {
 
-	INVALID_VIEWPORT(HttpStatus.BAD_REQUEST, "TRASH400_1", "뷰포트 범위가 올바르지 않습니다. minLat/minLng는 maxLat/maxLng보다 작거나 같아야 합니다.");
+	INVALID_VIEWPORT(HttpStatus.BAD_REQUEST, "TRASH400_1", "뷰포트 범위가 올바르지 않습니다. minLat/minLng는 maxLat/maxLng보다 작거나 같아야 합니다."),
+	TRASH_NOT_FOUND(HttpStatus.NOT_FOUND, "TRASH404_1", "존재하지 않는 쓰레기입니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;

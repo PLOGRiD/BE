@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -46,5 +47,20 @@ public class TrashController {
 		@RequestParam @DecimalMin("-180.0") @DecimalMax("180.0") Double maxLng
 	) {
 		return ApiResponse.onSuccess(trashQueryService.getTrashesInViewport(minLat, maxLat, minLng, maxLng));
+	}
+
+	@Operation(
+		summary = "쓰레기 상세 조회 API",
+		description = """
+        쓰레기 ID로 상세 정보를 조회합니다.
+        Parameter:
+        - `trashId`: 조회할 쓰레기 ID
+    """
+	)
+	@GetMapping("/{trashId}")
+	public ApiResponse<TrashResponseDTO.TrashMapResponseDTO> getTrashDetail(
+		@PathVariable Long trashId
+	) {
+		return ApiResponse.onSuccess(trashQueryService.getTrashDetail(trashId));
 	}
 }
