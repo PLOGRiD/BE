@@ -58,7 +58,7 @@ public class TrashController {
     """
 	)
 	@GetMapping("/{trashId}")
-	public ApiResponse<TrashResponseDTO.TrashMapResponseDTO> getTrashDetail(
+	public ApiResponse<TrashResponseDTO.TrashMapDetailResponseDTO> getTrashDetail(
 		@PathVariable Long trashId
 	) {
 		return ApiResponse.onSuccess(trashQueryService.getTrashDetail(trashId));

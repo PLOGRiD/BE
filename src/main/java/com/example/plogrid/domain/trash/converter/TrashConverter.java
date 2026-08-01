@@ -22,6 +22,15 @@ public class TrashConverter {
 			.latitude(trash.getLatitude())
 			.longitude(trash.getLongitude())
 			.category(trash.getCategory())
+			.build();
+	}
+
+	public static TrashResponseDTO.TrashMapDetailResponseDTO toTrashMapDetailResponseDTO(Trash trash) {
+		return TrashResponseDTO.TrashMapDetailResponseDTO.builder()
+			.id(trash.getId())
+			.latitude(trash.getLatitude())
+			.longitude(trash.getLongitude())
+			.category(trash.getCategory())
 			.collectedAt(trash.getCreatedAt())
 			.imageUrl(trash.getTrashImage())
 			.build();

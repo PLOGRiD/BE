@@ -10,6 +10,18 @@ import lombok.Getter;
 
 public class TrashResponseDTO {
 
+	@Schema(name = "쓰레기 지도 마커 개별 상세 응답")
+	@Builder
+	@Getter
+	public static class TrashMapDetailResponseDTO {
+		private Long id;
+		private double latitude;
+		private double longitude;
+		private TrashCategory category;
+		private LocalDateTime collectedAt;
+		private String imageUrl;
+	}
+
 	@Schema(name = "쓰레기 지도 마커 응답")
 	@Builder
 	@Getter
@@ -18,7 +30,5 @@ public class TrashResponseDTO {
 		private double latitude;
 		private double longitude;
 		private TrashCategory category;
-		private LocalDateTime collectedAt;
-		private String imageUrl;
 	}
 }
