@@ -1,5 +1,7 @@
 package com.example.plogrid.domain.member.dto;
 
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -55,6 +57,36 @@ public class MemberResponseDTO {
 
 		@Schema(description = "수거 쓰레기 유형")
 		private MemberTrashCategoryDTO trashCategory;
+	}
+
+	@Schema(name = "랭킹 항목")
+	@Builder
+	@Getter
+	public static class MemberRankingDTO {
+
+		@Schema(description = "순위", example = "1")
+		private int rank;
+
+		@Schema(description = "사용자 ID", example = "1")
+		private Long memberId;
+
+		@Schema(description = "사용자 닉네임", example = "김나나")
+		private String nickName;
+
+		@Schema(description = "환경 기여 점수", example = "320")
+		private int contributionScore;
+	}
+
+	@Schema(name = "환경 기여도 랭킹 조회 응답")
+	@Builder
+	@Getter
+	public static class MemberRankingResultDTO {
+
+		@Schema(description = "상위 10위 랭킹 목록")
+		private List<MemberRankingDTO> topRankings;
+
+		@Schema(description = "로그인한 회원의 랭킹")
+		private MemberRankingDTO myRanking;
 	}
 
 	@Schema(name = "카테고리별 쓰레기 수거량 조회 응답")
