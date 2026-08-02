@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @Tag(name = "Device", description = "수거 디바이스 API")
 @RestController
-@RequestMapping("/api/v1/device")
+@RequestMapping("/api/v1/devices")
 @RequiredArgsConstructor
 public class DeviceController {
 

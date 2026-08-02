@@ -21,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 @Tag(name = "Trash", description = "쓰레기 API")
 @RestController
-@RequestMapping("/api/v1/trash")
+@RequestMapping("/api/v1/trashes")
 @RequiredArgsConstructor
 @Validated
 public class TrashController {

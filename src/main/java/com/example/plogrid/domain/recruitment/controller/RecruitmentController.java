@@ -20,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 
 @Tag(name = "Recruitment", description = "단체 플로깅 모집 API")
 @RestController
-@RequestMapping("/api/v1/recruitment")
+@RequestMapping("/api/v1/recruitments")
 @RequiredArgsConstructor
 public class RecruitmentController {
 
