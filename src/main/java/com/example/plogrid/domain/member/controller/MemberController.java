@@ -1,12 +1,15 @@
 package com.example.plogrid.domain.member.controller;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.plogrid.domain.member.dto.MemberResponseDTO;
+import com.example.plogrid.domain.member.service.MemberAuthService;
 import com.example.plogrid.domain.member.service.MemberQueryService;
 import com.example.plogrid.global.apiPayload.ApiResponse;
+import com.example.plogrid.global.security.handler.AccessToken;
 import com.example.plogrid.global.security.handler.AuthUser;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberController {
 
 	private final MemberQueryService memberQueryService;
+	private final MemberAuthService memberAuthService;
 
 	@Operation(
 		summary = "회원 정보 조회 API",
@@ -58,5 +62,21 @@ public class MemberController {
 	@GetMapping("/ranking")
 	public ApiResponse<MemberResponseDTO.MemberRankingResultDTO> getRanking(@AuthUser Long memberId) {
 		return ApiResponse.onSuccess(memberQueryService.getRanking(memberId));
+	}
+
+	@Operation(
+		summary = "회원 탈퇴 API",
+		description = """
+			회원 탈퇴를 처리합니다.
+
+			- 탈퇴 후 아이디/이메일은 익명화되어 동일 정보로 재가입이 가능합니다.
+			- 사용자 닉네임은 '알 수 없음'으로 표시되며, 플로깅 기록 등의 환경 데이터는 보존됩니다.
+			- `Authorization: Bearer {accessToken}` 헤더가 필요합니다.
+			"""
+	)
+	@DeleteMapping("/me")
+	public ApiResponse<Void> withdraw(@AuthUser Long memberId, @AccessToken String accessToken) {
+		memberAuthService.withdraw(memberId, accessToken);
+		return ApiResponse.onSuccess(null);
 	}
 }
