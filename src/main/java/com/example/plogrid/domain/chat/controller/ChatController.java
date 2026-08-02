@@ -58,7 +58,7 @@ public class ChatController {
 			- 세션 ID(`chatSessionId`), 제목(`sessionTitle`), 마지막 메시지 시간(`lastMessageAt`)을 반환합니다.
 			"""
 	)
-	@GetMapping("/sessions")
+	@GetMapping
 	public ApiResponse<List<ChatResponseDTO.SessionSummary>> getSessions(@AuthUser Long memberId) {
 		return ApiResponse.onSuccess(chatQueryService.getSessions(memberId));
 	}
@@ -71,7 +71,7 @@ public class ChatController {
 			- 본인 소유의 세션이 아니거나 존재하지 않는 세션이면 거절됩니다.
 			"""
 	)
-	@GetMapping("/sessions/{chatSessionId}/messages")
+	@GetMapping("/{chatSessionId}/messages")
 	public ApiResponse<List<ChatResponseDTO.ChatLogResponse>> getMessages(
 		@AuthUser Long memberId, @PathVariable Long chatSessionId) {
 		return ApiResponse.onSuccess(chatQueryService.getMessages(memberId, chatSessionId));
@@ -87,7 +87,7 @@ public class ChatController {
 			- 하나라도 본인 소유의 세션이 아니거나 존재하지 않으면 전체 요청이 거절되고 아무 것도 삭제되지 않습니다.
 			"""
 	)
-	@DeleteMapping("/sessions")
+	@DeleteMapping
 	public ApiResponse<Void> deleteSessions(
 		@AuthUser Long memberId, @Valid @RequestBody ChatRequestDTO.SessionDeleteRequest request) {
 		chatCommandService.deleteSessions(memberId, request.getChatSessionIds());
