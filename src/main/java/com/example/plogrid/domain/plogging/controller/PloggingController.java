@@ -48,7 +48,7 @@ public class PloggingController {
 			- 세션 상태를 COMPLETED로 변경하고, 연동되어 있던 수거 디바이스의 연동도 함께 해제합니다.
 			"""
 	)
-	@PatchMapping
+	@PatchMapping("/active")
 	public ApiResponse<PloggingResponseDTO.EndResponseDTO> endPlogging(@AuthUser Long memberId) {
 		return ApiResponse.onSuccess(ploggingCommandService.endPlogging(memberId));
 	}

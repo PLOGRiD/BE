@@ -39,7 +39,7 @@ public class TrashController {
         - `maxLng`: 뷰포트 동쪽 경계 경도
     """
 	)
-	@GetMapping("/map")
+	@GetMapping
 	public ApiResponse<List<TrashResponseDTO.TrashMapResponseDTO>> getTrashesInViewport(
 		@RequestParam @DecimalMin("-90.0") @DecimalMax("90.0") Double minLat,
 		@RequestParam @DecimalMin("-90.0") @DecimalMax("90.0") Double maxLat,

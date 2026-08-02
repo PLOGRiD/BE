@@ -42,7 +42,7 @@ public class MemberController {
 			- `Authorization: Bearer {accessToken}` 헤더가 필요합니다.
 			"""
 	)
-	@GetMapping("/contribution")
+	@GetMapping("/me/contribution")
 	public ApiResponse<MemberResponseDTO.MemberContributionDTO> getMyContribution(@AuthUser Long memberId) {
 		return ApiResponse.onSuccess(memberQueryService.getMyContribution(memberId));
 	}
