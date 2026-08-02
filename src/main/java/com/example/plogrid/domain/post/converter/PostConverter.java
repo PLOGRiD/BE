@@ -1,6 +1,7 @@
 package com.example.plogrid.domain.post.converter;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 
@@ -16,7 +17,9 @@ public class PostConverter {
 	private PostConverter() {
 	}
 
-	public static PostResponseDTO.InfoListResponseDTO toInfoListResponseDTO(Page<Post> posts, Map<Long, Integer> likeCounts) {
+	public static PostResponseDTO.InfoListResponseDTO toInfoListResponseDTO(
+		Page<Post> posts, Map<Long, Integer> likeCounts, Set<Long> likedPostIds
+	) {
 		return PostResponseDTO.InfoListResponseDTO.builder()
 			.listSize(posts.getNumberOfElements())
 			.totalPage(posts.getTotalPages())
@@ -24,12 +27,13 @@ public class PostConverter {
 			.isFirst(posts.isFirst())
 			.isLast(posts.isLast())
 			.infos(posts.getContent().stream()
-				.map(post -> toInfoResponseDTO(post, likeCounts.getOrDefault(post.getId(), 0)))
+				.map(post -> toInfoResponseDTO(post, likeCounts.getOrDefault(post.getId(), 0),
+					likedPostIds.contains(post.getId())))
 				.toList())
 			.build();
 	}
 
-	public static PostResponseDTO.InfoResponseDTO toInfoResponseDTO(Post post, int likeCount) {
+	public static PostResponseDTO.InfoResponseDTO toInfoResponseDTO(Post post, int likeCount, boolean isLiked) {
 		return PostResponseDTO.InfoResponseDTO.builder()
 			.authorNickname(DUMMY_AUTHOR_NICKNAME)
 			.authorProfileImageUrl(DUMMY_AUTHOR_PROFILE_IMAGE_URL)
@@ -39,6 +43,7 @@ public class PostConverter {
 				.map(PostImage::getPostImageUrl)
 				.toList())
 			.likeCount(likeCount)
+			.isLiked(isLiked)
 			.build();
 	}
 

@@ -38,10 +38,11 @@ public class PostController {
 	)
 	@GetMapping
 	public ApiResponse<PostResponseDTO.InfoListResponseDTO> getInfoList(
+		@AuthUser Long memberId,
 		@RequestParam(name = "page", defaultValue = "1") @Min(1)Integer page,
 		@RequestParam(name = "size", defaultValue = "10") @Min(1)Integer size
 	) {
-		return ApiResponse.onSuccess(postQueryService.getInfoList(page, size));
+		return ApiResponse.onSuccess(postQueryService.getInfoList(memberId, page, size));
 	}
 
 	@Operation(

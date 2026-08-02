@@ -1,6 +1,9 @@
 package com.example.plogrid.domain.post.service;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
@@ -24,12 +27,18 @@ public class PostQueryService {
 	private final PostRepository postRepository;
 	private final LikeRepository likeRepository;
 
-	public PostResponseDTO.InfoListResponseDTO getInfoList(Integer page, Integer size) {
+	public PostResponseDTO.InfoListResponseDTO getInfoList(Long memberId, Integer page, Integer size) {
 		Page<Post> posts = postRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(page - 1, size));
+
+		List<Long> postIds = posts.getContent().stream()
+			.map(Post::getId)
+			.toList();
 
 		Map<Long, Integer> likeCounts = posts.getContent().stream()
 			.collect(Collectors.toMap(Post::getId, post -> likeRepository.countByPostId(post.getId())));
 
-		return PostConverter.toInfoListResponseDTO(posts, likeCounts);
+		Set<Long> likedPostIds = new HashSet<>(likeRepository.findLikedPostIds(memberId, postIds));
+
+		return PostConverter.toInfoListResponseDTO(posts, likeCounts, likedPostIds);
 	}
 }

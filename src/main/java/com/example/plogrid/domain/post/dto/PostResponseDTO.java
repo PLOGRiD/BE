@@ -31,6 +31,7 @@ public class PostResponseDTO {
 		private LocalDateTime createdAt;
 		private List<String> imageUrls;
 		private int likeCount;
+		private boolean isLiked;
 	}
 
 	@Schema(name = "좋아요 토글 응답")
