@@ -16,7 +16,7 @@ import com.example.plogrid.domain.plogging.service.PloggingCommandService;
 import com.example.plogrid.domain.plogging.service.PloggingQueryService;
 import com.example.plogrid.global.apiPayload.ApiResponse;
 import com.example.plogrid.global.security.handler.AuthUser;
-import com.example.plogrid.global.sse.sseService;
+import com.example.plogrid.global.sse.SseService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,7 +30,7 @@ public class PloggingController {
 
 	private final PloggingCommandService ploggingCommandService;
 	private final PloggingQueryService ploggingQueryService;
-	private final sseService sseService;
+	private final SseService sseService;
 
 	@Operation(
 		summary = "플로깅 시작 API",
