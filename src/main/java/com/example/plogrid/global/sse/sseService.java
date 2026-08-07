@@ -17,24 +17,24 @@ public class sseService {
 
 	private final Map<Long, SseEmitter> ploggingEmitters = new ConcurrentHashMap<>();
 
-	public SseEmitter getSseEmitter(Long ploggingId) {
+	public SseEmitter getSseEmitter(Long memberId) {
 		SseEmitter sseEmitter = new SseEmitter(30 * 60 * 1000L);
 
-		ploggingEmitters.put(ploggingId, sseEmitter);
+		ploggingEmitters.put(memberId, sseEmitter);
 
-		sseEmitter.onCompletion(() -> removeEmitter(ploggingId, sseEmitter));
-		sseEmitter.onTimeout(() -> removeEmitter(ploggingId, sseEmitter));
-		sseEmitter.onError(e -> removeEmitter(ploggingId, sseEmitter));
+		sseEmitter.onCompletion(() -> removeEmitter(memberId, sseEmitter));
+		sseEmitter.onTimeout(() -> removeEmitter(memberId, sseEmitter));
+		sseEmitter.onError(e -> removeEmitter(memberId, sseEmitter));
 
 		return sseEmitter;
 	}
 
-	private void removeEmitter(Long ploggingId, SseEmitter emitter) {
-		ploggingEmitters.remove(ploggingId, emitter);
+	private void removeEmitter(Long memberId, SseEmitter emitter) {
+		ploggingEmitters.remove(memberId, emitter);
 	}
 
-	public void send(Long ploggingId, Object data) {
-		SseEmitter emitter = ploggingEmitters.get(ploggingId);
+	public void send(Long memberId, Object data) {
+		SseEmitter emitter = ploggingEmitters.get(memberId);
 		if (emitter == null) {
 			return;
 		}
@@ -45,7 +45,7 @@ public class sseService {
 				.data(data)
 			);
 		} catch (IOException e) {
-			removeEmitter(ploggingId, emitter);
+			removeEmitter(memberId, emitter);
 		}
 	}
 }
