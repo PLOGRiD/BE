@@ -1,16 +1,22 @@
 package com.example.plogrid.domain.plogging.controller;
 
+import java.io.IOException;
+
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.example.plogrid.domain.plogging.dto.PloggingResponseDTO;
 import com.example.plogrid.domain.plogging.service.PloggingCommandService;
 import com.example.plogrid.domain.plogging.service.PloggingQueryService;
 import com.example.plogrid.global.apiPayload.ApiResponse;
 import com.example.plogrid.global.security.handler.AuthUser;
+import com.example.plogrid.global.sse.sseService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +30,7 @@ public class PloggingController {
 
 	private final PloggingCommandService ploggingCommandService;
 	private final PloggingQueryService ploggingQueryService;
+	private final sseService sseService;
 
 	@Operation(
 		summary = "플로깅 시작 API",
@@ -65,5 +72,26 @@ public class PloggingController {
 	@GetMapping("/recent")
 	public ApiResponse<PloggingResponseDTO.RecentResponseDTO> getRecentPlogging(@AuthUser Long memberId) {
 		return ApiResponse.onSuccess(ploggingQueryService.getRecentPlogging(memberId));
+	}
+
+	@Operation(
+		summary = "플로깅 화면 데이터 조회 API",
+		description = """
+			플로깅 진행 중 데이터를 SSE를 통해 조회합니다.
+			- 쓰레기 투입 감지 이벤트를 전송합니다.
+			- 연결 시점의 쓰레기 수거 현황(trashSummary, trashLocations)데이터를 전송합니다.
+			"""
+	)
+	@GetMapping(value = "/{ploggingId}/events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+	public SseEmitter subscribePlogging(@PathVariable Long ploggingId) {
+		SseEmitter emitter = sseService.getSseEmitter(ploggingId);
+		try {
+			emitter.send(SseEmitter.event()
+				.name("plogging-in-progress")
+				.data(ploggingQueryService.getPloggingProcess(ploggingId)));
+		} catch (IOException e) {
+			emitter.completeWithError(e);
+		}
+		return emitter;
 	}
 }

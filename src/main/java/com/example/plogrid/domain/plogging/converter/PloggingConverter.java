@@ -59,6 +59,24 @@ public class PloggingConverter {
 			.build();
 	}
 
+	public static PloggingResponseDTO.PloggingProcessResponseDTO toPloggingProcessResponseDTO(List<Trash> trashes) {
+		return PloggingResponseDTO.PloggingProcessResponseDTO.builder()
+			.trashSummary(toTrashSummaryResponseDTO(trashes))
+			.trashLocations(toTrashLocationResponseDTOList(trashes))
+			.build();
+	}
+
+	private static List<PloggingResponseDTO.TrashLocationResponseDTO> toTrashLocationResponseDTOList(
+		List<Trash> trashes) {
+		return trashes.stream()
+			.map(trash -> PloggingResponseDTO.TrashLocationResponseDTO.builder()
+				.trashId(trash.getId())
+				.latitude(trash.getLatitude())
+				.longitude(trash.getLongitude())
+				.build())
+			.toList();
+	}
+
 	private static double percentage(List<Trash> trashes, TrashCategory category, int totalCount) {
 		if (totalCount == 0) {
 			return 0;
