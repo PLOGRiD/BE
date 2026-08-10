@@ -75,4 +75,21 @@ public class PloggingResponseDTO {
 		private double durationSeconds;
 		private int trashCount;
 	}
+
+	@Schema(name = "플로깅 진행 중 응답")
+	@Builder
+	@Getter
+	public static class PloggingProcessResponseDTO {
+		private TrashSummaryResponseDTO trashSummary;
+		private List<TrashLocationResponseDTO> trashLocations;
+	}
+
+	@Schema(name = "쓰레기 위치 응답")
+	@Builder
+	@Getter
+	public static class TrashLocationResponseDTO {
+		private Long trashId;
+		private double latitude;
+		private double longitude;
+	}
 }
