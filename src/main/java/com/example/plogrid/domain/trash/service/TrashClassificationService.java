@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,7 @@ import com.example.plogrid.domain.trash.dto.TrashRequestDTO;
 import com.example.plogrid.domain.trash.entity.Trash;
 import com.example.plogrid.domain.trash.entity.enums.TrashCategory;
 import com.example.plogrid.domain.trash.entity.enums.TrashSubCategory;
+import com.example.plogrid.domain.trash.event.TrashDetectedEvent;
 import com.example.plogrid.domain.trash.repository.TrashRepository;
 import com.example.plogrid.global.apiPayload.code.TrashErrorCode;
 import com.example.plogrid.global.apiPayload.exception.GeneralException;
@@ -35,6 +37,7 @@ public class TrashClassificationService {
 	private final SpectralSensorService spectralSensorService;
 	private final TrashRepository trashRepository;
 	private final S3Uploader s3Uploader;
+	private final ApplicationEventPublisher eventPublisher;
 
 	@Async("taskExecutor")
 	public void trashClassification(
@@ -68,6 +71,10 @@ public class TrashClassificationService {
 		);
 
 		trashRepository.save(trash);
+
+		Long memberId = plogging.getMember().getId();
+
+		eventPublisher.publishEvent(new TrashDetectedEvent(memberId, plogging.getId()));
 	}
 
 	private TrashSubCategory resolveSubCategory(String className) {
