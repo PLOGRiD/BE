@@ -19,5 +19,7 @@ public interface MemberDeviceRepository extends JpaRepository<MemberCollectionDe
 
 	boolean existsByMemberId(Long memberId);
 
+	Optional<MemberCollectionDevice> findByMemberId(Long memberId);
+
 	void deleteByMemberId(Long memberId);
 }

@@ -2,6 +2,7 @@ package com.example.plogrid.domain.device.entity;
 
 import com.example.plogrid.domain.common.BaseEntity;
 import com.example.plogrid.domain.member.entity.Member;
+import com.example.plogrid.domain.plogging.entity.Plogging;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -38,10 +39,18 @@ public class MemberCollectionDevice extends BaseEntity {
 	@JoinColumn(name = "collection_device_id", nullable = false)
 	private CollectionDevice collectionDevice;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "plogging_id")
+	private Plogging plogging;
+
 	public static MemberCollectionDevice create(Member member, CollectionDevice collectionDevice) {
 		return MemberCollectionDevice.builder()
 			.member(member)
 			.collectionDevice(collectionDevice)
 			.build();
+	}
+
+	public void linkPlogging(Plogging plogging) {
+		this.plogging = plogging;
 	}
 }

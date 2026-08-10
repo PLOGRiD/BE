@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.plogrid.domain.plogging.dto.PloggingRequestDTO;
 import com.example.plogrid.domain.plogging.dto.PloggingResponseDTO;
 import com.example.plogrid.domain.plogging.service.PloggingCommandService;
+import com.example.plogrid.domain.trash.dto.TrashRequestDTO;
 import com.example.plogrid.global.apiPayload.ApiResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,7 +34,7 @@ public class WasteClassificationController {
 	)
 	@PostMapping(value = "/waste-classification", consumes = "multipart/form-data")
 	public ApiResponse<PloggingResponseDTO.TrashClassificationResponseDTO> trashClassification(
-		@Valid @ModelAttribute PloggingRequestDTO.WasteClassification request) throws IOException {
+		@Valid @ModelAttribute TrashRequestDTO.WasteClassification request) throws IOException {
 		return ApiResponse.onSuccess(ploggingCommandService.trashClassification(request));
 	}
 }
