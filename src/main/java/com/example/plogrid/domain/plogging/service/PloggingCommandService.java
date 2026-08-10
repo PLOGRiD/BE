@@ -9,6 +9,7 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.plogrid.domain.device.entity.MemberCollectionDevice;
 import com.example.plogrid.domain.device.repository.MemberDeviceRepository;
 import com.example.plogrid.domain.member.entity.Member;
 import com.example.plogrid.domain.member.repository.MemberRepository;
@@ -46,14 +47,15 @@ public class PloggingCommandService {
 	private final MemberStatisticsService memberStatisticsService;
 
 	public PloggingResponseDTO.StartResponseDTO startPlogging(Long memberId) {
-		if (!memberDeviceRepository.existsByMemberId(memberId)) {
-			throw new GeneralException(DeviceErrorCode.DEVICE_NOT_LINKED);
-		}
+		MemberCollectionDevice memberCollectionDevice = memberDeviceRepository.findByMemberId(memberId)
+			.orElseThrow(() -> new GeneralException(DeviceErrorCode.DEVICE_NOT_LINKED));
 
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new GeneralException(MemberErrorCode.MEMBER_NOT_FOUND));
 
 		Plogging plogging = ploggingRepository.save(Plogging.create(member));
+
+		memberCollectionDevice.linkPlogging(plogging);
 
 		return PloggingResponseDTO.StartResponseDTO.builder()
 			.ploggingId(plogging.getId())
