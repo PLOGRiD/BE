@@ -33,7 +33,7 @@ public class SseService {
 		ploggingEmitters.remove(memberId, emitter);
 	}
 
-	public void send(Long memberId, Object data) {
+	public void send(Long memberId, String eventName, Object data) {
 		SseEmitter emitter = ploggingEmitters.get(memberId);
 		if (emitter == null) {
 			return;
@@ -41,7 +41,7 @@ public class SseService {
 
 		try {
 			emitter.send(SseEmitter.event()
-				.name("plogging-in-progress")
+				.name(eventName)
 				.data(data)
 			);
 		} catch (IOException e) {

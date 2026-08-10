@@ -43,4 +43,11 @@ public class PloggingQueryService {
 
 		return PloggingConverter.toPloggingProcessResponseDTO(trashes);
 	}
+
+	public Long getMemberId(Long ploggingId) {
+		Plogging plogging = ploggingRepository.findById(ploggingId)
+			.orElseThrow(() -> new GeneralException(PloggingErrorCode.PLOGGING_NOT_FOUND));
+
+		return plogging.getMember().getId();
+	}
 }

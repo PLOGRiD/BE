@@ -84,7 +84,8 @@ public class PloggingController {
 	)
 	@GetMapping(value = "/{ploggingId}/events", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
 	public SseEmitter subscribePlogging(@PathVariable Long ploggingId) {
-		SseEmitter emitter = sseService.getSseEmitter(ploggingId);
+		Long memberId = ploggingQueryService.getMemberId(ploggingId);
+		SseEmitter emitter = sseService.getSseEmitter(memberId);
 		try {
 			emitter.send(SseEmitter.event()
 				.name("plogging-in-progress")
