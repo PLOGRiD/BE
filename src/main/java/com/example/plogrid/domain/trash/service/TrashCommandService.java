@@ -16,20 +16,16 @@ import com.example.plogrid.global.apiPayload.exception.GeneralException;
 import com.example.plogrid.global.multipart.InMemoryMultipartFile;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Slf4j
 public class TrashCommandService {
 
 	private final MemberDeviceRepository memberDeviceRepository;
 	private final TrashClassificationService trashClassificationService;
 
 	public void trashProcess(TrashRequestDTO.WasteClassification request, Long deviceId) throws IOException {
-		log.info("Trash processing for device id {}", deviceId);
-
 		MemberCollectionDevice memberCollectionDevice = memberDeviceRepository.findByCollectionDeviceId(deviceId)
 			.orElseThrow(() -> new GeneralException(DeviceErrorCode.DEVICE_NOT_LINKED));
 

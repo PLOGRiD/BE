@@ -25,12 +25,10 @@ import com.example.plogrid.global.apiPayload.exception.GeneralException;
 import com.example.plogrid.global.s3.S3Uploader;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
-@Slf4j
 public class TrashClassificationService {
 
 	private final YoloService yoloService;
@@ -42,36 +40,23 @@ public class TrashClassificationService {
 	public void trashClassification(
 		TrashRequestDTO.WasteClassification request, Plogging plogging) throws IOException {
 
-		log.info("Trash classification started for plogging id {}", plogging.getId());
-
 		YoloResponseDTO result = yoloService.predict(request.getImage());
-		log.info("YOLO prediction completed: filename={}, {} detection(s)", result.getFilename(), result.getDetections().size());
-		result.getDetections().forEach(d ->
-			log.info("  detection: classId={}, className={}, confidence={}, bbox={}",
-				d.getClassId(), d.getClassName(), d.getConfidence(), d.getBbox()));
 
 		YoloResponseDTO.Detection detection = result.getDetections().stream()
 			.max(Comparator.comparingDouble(YoloResponseDTO.Detection::getConfidence))
 			.orElseThrow(() -> new GeneralException(TrashErrorCode.NO_TRASH_DETECTED));
-		log.info("Selected detection: className={}, confidence={}", detection.getClassName(), detection.getConfidence());
 
 		TrashSubCategory subCategory = resolveSubCategory(detection.getClassName());
 		TrashCategory category = subCategory.getCategory();
-		log.info("Resolved subCategory={}, category={}", subCategory, category);
 
 		boolean needsSpectralAnalysis = SPECTRAL_TARGET_CLASSES.contains(detection.getClassName());
-		log.info("Needs spectral analysis: {}", needsSpectralAnalysis);
 
 		if (needsSpectralAnalysis) {
 			SpectralResponseDTO spectralResult = spectralSensorService.predict(request);
-			log.info("Spectral analysis raw result: label={}, probability={}, scores={}",
-				spectralResult.getLabel(), spectralResult.getProbability(), spectralResult.getScores());
 			category = resolveCategory(spectralResult.getLabel());
-			log.info("Spectral analysis result: label={}, resolved category={}", spectralResult.getLabel(), category);
 		}
 
 		String trashImage = s3Uploader.uploadTrashImage(request.getImage());
-		log.info("Trash image uploaded: {}", trashImage);
 
 		Trash trash = Trash.create(
 			plogging,
@@ -83,7 +68,6 @@ public class TrashClassificationService {
 		);
 
 		trashRepository.save(trash);
-		log.info("Trash saved: id={}, plogging id={}", trash.getId(), plogging.getId());
 	}
 
 	private TrashSubCategory resolveSubCategory(String className) {
