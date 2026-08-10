@@ -13,18 +13,23 @@ import com.example.plogrid.domain.trash.dto.TrashRequestDTO;
 import com.example.plogrid.global.apiPayload.code.DeviceErrorCode;
 import com.example.plogrid.global.apiPayload.code.PloggingErrorCode;
 import com.example.plogrid.global.apiPayload.exception.GeneralException;
+import com.example.plogrid.global.multipart.InMemoryMultipartFile;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class TrashCommandService {
 
 	private final MemberDeviceRepository memberDeviceRepository;
 	private final TrashClassificationService trashClassificationService;
 
 	public void trashProcess(TrashRequestDTO.WasteClassification request, Long deviceId) throws IOException {
+		log.info("Trash processing for device id {}", deviceId);
+
 		MemberCollectionDevice memberCollectionDevice = memberDeviceRepository.findByCollectionDeviceId(deviceId)
 			.orElseThrow(() -> new GeneralException(DeviceErrorCode.DEVICE_NOT_LINKED));
 
@@ -33,6 +38,8 @@ public class TrashCommandService {
 		if (!plogging.getStatus().equals(PloggingStatus.IN_PROGRESS)) {
 			throw new GeneralException(PloggingErrorCode.PLOGGING_NOT_IN_PROGRESS);
 		}
+
+		request.setImage(new InMemoryMultipartFile(request.getImage()));
 
 		trashClassificationService.trashClassification(request, plogging);
 	}

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Schema(name = "YOLO 분석 결과")
 @Getter
@@ -40,6 +41,7 @@ public class YoloResponseDTO {
 
 	@Getter
 	@NoArgsConstructor
+	@ToString
 	public static class BoundingBox {
 		private double x1;
 		private double y1;
