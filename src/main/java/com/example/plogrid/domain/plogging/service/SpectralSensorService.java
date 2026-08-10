@@ -9,9 +9,9 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.example.plogrid.domain.plogging.dto.PloggingRequestDTO;
 import com.example.plogrid.domain.plogging.dto.SpectralRequestDTO;
 import com.example.plogrid.domain.plogging.dto.SpectralResponseDTO;
+import com.example.plogrid.domain.trash.dto.TrashRequestDTO;
 
 @Service
 public class SpectralSensorService {
@@ -21,7 +21,7 @@ public class SpectralSensorService {
 	@Value("${spectral.url}")
 	private String spectralUrl;
 
-	public SpectralResponseDTO predict(PloggingRequestDTO.WasteClassification request) {
+	public SpectralResponseDTO predict(TrashRequestDTO.WasteClassification request) {
 
 		List<Double> values = List.of(
 			request.getA(), request.getB(), request.getC(), request.getD(),

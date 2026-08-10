@@ -1,4 +1,4 @@
-package com.example.plogrid.domain.plogging.dto;
+package com.example.plogrid.domain.trash.dto;
 
 import java.time.LocalDateTime;
 
@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-public class PloggingRequestDTO {
+public class TrashRequestDTO {
 
 	@Schema(name = "쓰레기 분석 요청")
 	@Getter

@@ -14,13 +14,13 @@ import com.example.plogrid.domain.member.entity.Member;
 import com.example.plogrid.domain.member.repository.MemberRepository;
 import com.example.plogrid.domain.member.service.MemberStatisticsService;
 import com.example.plogrid.domain.plogging.converter.PloggingConverter;
-import com.example.plogrid.domain.plogging.dto.PloggingRequestDTO;
 import com.example.plogrid.domain.plogging.dto.PloggingResponseDTO;
 import com.example.plogrid.domain.plogging.dto.SpectralResponseDTO;
 import com.example.plogrid.domain.plogging.dto.YoloResponseDTO;
 import com.example.plogrid.domain.plogging.entity.Plogging;
 import com.example.plogrid.domain.plogging.entity.enums.PloggingStatus;
 import com.example.plogrid.domain.plogging.repository.PloggingRepository;
+import com.example.plogrid.domain.trash.dto.TrashRequestDTO;
 import com.example.plogrid.domain.trash.entity.Trash;
 import com.example.plogrid.domain.trash.entity.enums.TrashCategory;
 import com.example.plogrid.domain.trash.entity.enums.TrashSubCategory;
@@ -91,7 +91,7 @@ public class PloggingCommandService {
 	}
 
 	public PloggingResponseDTO.TrashClassificationResponseDTO trashClassification(
-		PloggingRequestDTO.WasteClassification request) throws IOException {
+		TrashRequestDTO.WasteClassification request) throws IOException {
 
 		YoloResponseDTO result = yoloService.predict(request.getImage());
 
