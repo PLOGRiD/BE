@@ -14,6 +14,7 @@ import com.example.plogrid.global.apiPayload.code.DeviceErrorCode;
 import com.example.plogrid.global.apiPayload.code.PloggingErrorCode;
 import com.example.plogrid.global.apiPayload.exception.GeneralException;
 import com.example.plogrid.global.multipart.InMemoryMultipartFile;
+import com.example.plogrid.global.sse.SseService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +25,7 @@ public class TrashCommandService {
 
 	private final MemberDeviceRepository memberDeviceRepository;
 	private final TrashClassificationService trashClassificationService;
+	private final SseService sseService;
 
 	public void trashProcess(TrashRequestDTO.WasteClassification request, Long deviceId) throws IOException {
 		MemberCollectionDevice memberCollectionDevice = memberDeviceRepository.findByCollectionDeviceId(deviceId)
@@ -35,8 +37,11 @@ public class TrashCommandService {
 			throw new GeneralException(PloggingErrorCode.PLOGGING_NOT_IN_PROGRESS);
 		}
 
-		request.setImage(new InMemoryMultipartFile(request.getImage()));
+		Long memberId = memberCollectionDevice.getMember().getId();
 
+		request.setImage(new InMemoryMultipartFile(request.getImage()));
 		trashClassificationService.trashClassification(request, plogging);
+
+		sseService.send(memberId, "trash-detective-event", "쓰레기 투입이 감지되었어요!");
 	}
 }
