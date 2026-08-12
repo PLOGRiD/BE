@@ -37,6 +37,7 @@ public class PloggingConverter {
 			.petBottlePercentage(percentage(trashes, TrashCategory.PET_BOTTLE, totalCount))
 			.plasticPercentage(percentage(trashes, TrashCategory.PLASTIC, totalCount))
 			.cigarettePercentage(percentage(trashes, TrashCategory.CIGARETTE, totalCount))
+			.styrofoamPercentage(percentage(trashes, TrashCategory.STYROFOAM, totalCount))
 			.build();
 	}
 

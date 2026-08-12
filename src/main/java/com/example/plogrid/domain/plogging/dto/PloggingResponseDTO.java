@@ -53,6 +53,7 @@ public class PloggingResponseDTO {
 		private double petBottlePercentage;
 		private double plasticPercentage;
 		private double cigarettePercentage;
+		private double styrofoamPercentage;
 	}
 
 	@Schema(name = "수거한 쓰레기 개별 상세 응답")
