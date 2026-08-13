@@ -32,7 +32,7 @@ public enum TrashSubCategory {
 	DRINK_CAN("음료수캔", TrashCategory.CAN),
 	COFFEE_CAN("커피캔", TrashCategory.CAN),
 	TIN_CAN("통조림캔", TrashCategory.CAN),
-	DISPOSABLE_DRINK_CUP("일회용음료수잔", TrashCategory.PET_BOTTLE),
+	DISPOSABLE_DRINK_CUP("일회용음료수잔", TrashCategory.PLASTIC),
 	PET_BOTTLE("페트병", TrashCategory.PET_BOTTLE),
 	LARGE_PLASTIC_CONTAINER("대용량플라스틱통", TrashCategory.PLASTIC),
 	WASTE_CONTAINER("밀폐용기", TrashCategory.PLASTIC),
