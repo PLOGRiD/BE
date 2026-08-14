@@ -23,7 +23,7 @@ public class TrashRequestDTO {
 		private MultipartFile image;
 
 		@Schema(description = "촬영 시각", example = "2026-07-12T15:30:00")
-		@NotNull(message = "촬영 시각을 입력해주세요.")
+		// @NotNull(message = "촬영 시각을 입력해주세요.")
 		private LocalDateTime timestamp;
 
 		@Schema(description = "위도", example = "37.5665")
