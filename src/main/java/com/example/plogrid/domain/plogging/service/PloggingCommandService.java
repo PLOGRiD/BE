@@ -40,6 +40,7 @@ public class PloggingCommandService {
 
 	private final YoloService yoloService;
 	private final SpectralSensorService spectralSensorService;
+	private final PloggingLocationService ploggingLocationService;
 	private final PloggingRepository ploggingRepository;
 	private final MemberRepository memberRepository;
 	private final MemberDeviceRepository memberDeviceRepository;
@@ -68,8 +69,7 @@ public class PloggingCommandService {
 
 		memberDeviceRepository.deleteByMemberId(memberId);
 
-		// TODO : 이동거리 계산 로직 미구현으로 임시 값 사용
-		double distanceMeters = 1500.0;
+		double distanceMeters = ploggingLocationService.getAccumulatedDistance(plogging.getId());
 		double durationSeconds = Duration.between(plogging.getCreatedAt(), LocalDateTime.now()).getSeconds();
 
 		List<Trash> trashes = trashRepository.findByPloggingId(plogging.getId());
@@ -82,6 +82,7 @@ public class PloggingCommandService {
 		memberStatisticsService.reflectPloggingResult(memberId, distanceMeters, durationSeconds, categories, contributionScore);
 
 		plogging.complete(distanceMeters, durationSeconds);
+		ploggingLocationService.clear(plogging.getId());
 
 		return PloggingConverter.toEndResponseDTO(plogging, distanceMeters, durationSeconds, contributionScore, trashes);
 	}
