@@ -74,7 +74,9 @@ public class TrashClassificationService {
 
 		Long memberId = plogging.getMember().getId();
 
-		eventPublisher.publishEvent(new TrashDetectedEvent(memberId, plogging.getId()));
+		eventPublisher.publishEvent(new TrashDetectedEvent(
+			memberId, trash.getId(), trash.getCategory(), trash.getLatitude(), trash.getLongitude()
+		));
 	}
 
 	private TrashSubCategory resolveSubCategory(String className) {

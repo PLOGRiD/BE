@@ -62,9 +62,30 @@ public class PloggingConverter {
 
 	public static PloggingResponseDTO.PloggingProcessResponseDTO toPloggingProcessResponseDTO(List<Trash> trashes) {
 		return PloggingResponseDTO.PloggingProcessResponseDTO.builder()
-			.trashSummary(toTrashSummaryResponseDTO(trashes))
+			.trashSummary(toTrashCountSummaryResponseDTO(trashes))
 			.trashLocations(toTrashLocationResponseDTOList(trashes))
 			.build();
+	}
+
+	private static PloggingResponseDTO.TrashCountSummaryResponseDTO toTrashCountSummaryResponseDTO(
+		List<Trash> trashes) {
+		return PloggingResponseDTO.TrashCountSummaryResponseDTO.builder()
+			.totalCount(trashes.size())
+			.vinylCount(count(trashes, TrashCategory.VINYL))
+			.paperCount(count(trashes, TrashCategory.PAPER))
+			.glassCount(count(trashes, TrashCategory.GLASS))
+			.canCount(count(trashes, TrashCategory.CAN))
+			.petBottleCount(count(trashes, TrashCategory.PET_BOTTLE))
+			.plasticCount(count(trashes, TrashCategory.PLASTIC))
+			.cigaretteCount(count(trashes, TrashCategory.CIGARETTE))
+			.styrofoamCount(count(trashes, TrashCategory.STYROFOAM))
+			.build();
+	}
+
+	private static int count(List<Trash> trashes, TrashCategory category) {
+		return (int) trashes.stream()
+			.filter(trash -> trash.getCategory() == category)
+			.count();
 	}
 
 	private static List<PloggingResponseDTO.TrashLocationResponseDTO> toTrashLocationResponseDTOList(

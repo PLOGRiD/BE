@@ -1,4 +1,12 @@
 package com.example.plogrid.domain.trash.event;
 
-public record TrashDetectedEvent(Long memberId, Long ploggingId) {
+import com.example.plogrid.domain.trash.entity.enums.TrashCategory;
+
+public record TrashDetectedEvent(
+	Long memberId,
+	Long trashId,
+	TrashCategory category,
+	double latitude,
+	double longitude
+) {
 }

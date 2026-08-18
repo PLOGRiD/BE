@@ -81,8 +81,24 @@ public class PloggingResponseDTO {
 	@Builder
 	@Getter
 	public static class PloggingProcessResponseDTO {
-		private TrashSummaryResponseDTO trashSummary;
+		private TrashCountSummaryResponseDTO trashSummary;
 		private List<TrashLocationResponseDTO> trashLocations;
+	}
+
+	@Schema(name = "수거한 쓰레기 개수 요약 응답")
+	@Builder
+	@Getter
+	public static class TrashCountSummaryResponseDTO {
+
+		private int totalCount;
+		private int vinylCount;
+		private int paperCount;
+		private int glassCount;
+		private int canCount;
+		private int petBottleCount;
+		private int plasticCount;
+		private int cigaretteCount;
+		private int styrofoamCount;
 	}
 
 	@Schema(name = "쓰레기 위치 응답")
@@ -92,5 +108,22 @@ public class PloggingResponseDTO {
 		private Long trashId;
 		private double latitude;
 		private double longitude;
+	}
+
+	@Schema(name = "쓰레기 추가 감지 응답")
+	@Builder
+	@Getter
+	public static class TrashAddedResponseDTO {
+		private Long trashId;
+		private TrashCategory category;
+		private double latitude;
+		private double longitude;
+	}
+
+	@Schema(name = "플로깅 이동 거리 갱신 응답")
+	@Builder
+	@Getter
+	public static class DistanceUpdatedResponseDTO {
+		private double distanceMeters;
 	}
 }

@@ -6,11 +6,13 @@ import java.util.Map;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.example.plogrid.domain.plogging.dto.PloggingResponseDTO;
 import com.example.plogrid.domain.plogging.entity.Plogging;
 import com.example.plogrid.domain.plogging.entity.enums.PloggingStatus;
 import com.example.plogrid.domain.plogging.repository.PloggingRepository;
 import com.example.plogrid.global.apiPayload.code.PloggingErrorCode;
 import com.example.plogrid.global.apiPayload.exception.GeneralException;
+import com.example.plogrid.global.sse.SseService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,6 +29,7 @@ public class PloggingLocationService {
 
 	private final StringRedisTemplate redisTemplate;
 	private final PloggingRepository ploggingRepository;
+	private final SseService sseService;
 
 	public void updateLocation(Long memberId, double latitude, double longitude) {
 		Plogging plogging = ploggingRepository.findByMemberIdAndStatus(memberId, PloggingStatus.IN_PROGRESS)
@@ -48,6 +51,11 @@ public class PloggingLocationService {
 			FIELD_DISTANCE, String.valueOf(distance)
 		));
 		redisTemplate.expire(key, LOCATION_TTL);
+
+		sseService.send(memberId, "plogging-distance-updated",
+			PloggingResponseDTO.DistanceUpdatedResponseDTO.builder()
+				.distanceMeters(distance)
+				.build());
 	}
 
 	public double getAccumulatedDistance(Long ploggingId) {
