@@ -7,12 +7,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.example.plogrid.domain.plogging.dto.PloggingRequestDTO;
 import com.example.plogrid.domain.plogging.dto.PloggingResponseDTO;
 import com.example.plogrid.domain.plogging.service.PloggingCommandService;
+import com.example.plogrid.domain.plogging.service.PloggingLocationService;
 import com.example.plogrid.domain.plogging.service.PloggingQueryService;
 import com.example.plogrid.global.apiPayload.ApiResponse;
 import com.example.plogrid.global.security.handler.AuthUser;
@@ -30,6 +33,7 @@ public class PloggingController {
 
 	private final PloggingCommandService ploggingCommandService;
 	private final PloggingQueryService ploggingQueryService;
+	private final PloggingLocationService ploggingLocationService;
 	private final SseService sseService;
 
 	@Operation(
@@ -94,5 +98,23 @@ public class PloggingController {
 			emitter.completeWithError(e);
 		}
 		return emitter;
+	}
+
+	@Operation(
+		summary = "플로깅 중 현재 위치 전송 API",
+		description = """
+			현재 로그인한 회원의 진행 중인 플로깅 세션에 현재 위치(위도/경도)를 전송합니다.
+			클라이언트는 플로깅이 진행되는 동안 약 3초 간격으로 이 API를 반복 호출해야 합니다.
+
+			- 진행 중인 플로깅이 없으면 404(PLOGGING404_1, 진행 중인 플로깅이 없습니다)로 거절됩니다.
+			- 이전에 전송된 좌표가 있으면 이번 좌표와의 직선 거리(Haversine)를 계산해 누적 거리에 더합니다.
+			"""
+	)
+	@PostMapping("/location")
+	public ApiResponse<Void> updateLocation(
+		@AuthUser Long memberId,
+		@RequestBody PloggingRequestDTO.UpdateLocationRequestDTO request) {
+		ploggingLocationService.updateLocation(memberId, request.getLatitude(), request.getLongitude());
+		return ApiResponse.onSuccess(null);
 	}
 }
