@@ -51,6 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			|| path.startsWith("/api/v1/members/auth/sign-in")
 			|| path.startsWith("/api/v1/members/auth/reissue")
 			|| path.startsWith("/api/v1/common/health")
-			|| path.startsWith("/api/v1/plogging/waste-classification");
+			|| path.startsWith("/api/v1/plogging/waste-classification")
+			|| path.startsWith("/api/v1/trashes/waste-classification");
 	}
 }

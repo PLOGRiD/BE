@@ -18,6 +18,10 @@ public class TrashRequestDTO {
 	@NoArgsConstructor
 	public static class WasteClassification {
 
+		@Schema(description = "디바이스 ID")
+		@NotNull(message = "디바이스 ID를 입력해주세요.")
+		private Long deviceId;
+
 		@Schema(description = "쓰레기 이미지 파일")
 		@NotNull(message = "이미지를 입력해주세요.")
 		private MultipartFile image;

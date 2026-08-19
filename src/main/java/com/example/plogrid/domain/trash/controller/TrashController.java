@@ -18,7 +18,6 @@ import com.example.plogrid.domain.trash.dto.TrashResponseDTO;
 import com.example.plogrid.domain.trash.service.TrashCommandService;
 import com.example.plogrid.domain.trash.service.TrashQueryService;
 import com.example.plogrid.global.apiPayload.ApiResponse;
-import com.example.plogrid.global.security.handler.AuthUser;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -77,13 +76,15 @@ public class TrashController {
 		summary = "[디바이스] 쓰레기 분석 API",
 		description = """
         쓰레기 수거 장치가 전달한 이미지와 분광센서 값으로 쓰레기 종류를 분석하고 저장합니다.
+        (임시 프로토타입: 디바이스 인증 없이 요청 바디의 `deviceId`로 디바이스를 식별합니다.)
 
-        - 인증된 디바이스(`deviceId`)에 연결된 회원의 진행 중인 플로깅 세션에만 등록됩니다. 디바이스가 연결되어 있지 않거나 진행 중인 플로깅이 없으면 실패합니다.
+        - `deviceId`에 연결된 회원의 진행 중인 플로깅 세션에만 등록됩니다. 디바이스가 연결되어 있지 않거나 진행 중인 플로깅이 없으면 실패합니다.
         - YOLO 모델로 이미지를 1차 탐지한 뒤, confidence가 가장 높은 탐지 결과를 기준으로 쓰레기 서브카테고리를 판별합니다.
         - 유리병/페트병처럼 육안(YOLO)만으로는 재질 구분이 어려운 항목은 분광센서 값으로 재질(대분류 카테고리)을 재판별합니다.
         - 이미지 분석·업로드·저장은 비동기로 처리되며, 해당 API는 처리 완료를 기다리지 않고 즉시 응답합니다.
 
         Parameter:
+        - `deviceId`: 쓰레기 수거 장치 ID
         - `image`: 쓰레기 이미지 파일
         - `timestamp`: 촬영 시각
         - `latitude`, `longitude`: 촬영 위치 좌표
@@ -92,9 +93,8 @@ public class TrashController {
 	)
 	@PostMapping(value = "/waste-classification", consumes = "multipart/form-data")
 	public ApiResponse<PloggingResponseDTO.TrashClassificationResponseDTO> trashClassification(
-		@AuthUser Long deviceId,
 		@Valid @ModelAttribute TrashRequestDTO.WasteClassification request) throws IOException {
-		trashCommandService.trashProcess(request, deviceId);
+		trashCommandService.trashProcess(request, request.getDeviceId());
 		return ApiResponse.onSuccess(null);
 	}
 }
