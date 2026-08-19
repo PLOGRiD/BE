@@ -52,6 +52,9 @@ yolo:
 spectral:
   url: ${SPECTRAL_URL}
 
+chatbot:
+  url: ${CHATBOT_URL}
+
 trash:
   viewport:
     max-result-size: ${TRASH_VIEWPORT_MAX_RESULT_SIZE:200}

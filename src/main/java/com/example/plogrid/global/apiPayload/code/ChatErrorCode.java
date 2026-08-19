@@ -11,7 +11,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ChatErrorCode implements BaseErrorCode {
 
-	CHAT_SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT404_1", "존재하지 않는 채팅 세션입니다.");
+	CHAT_SESSION_NOT_FOUND(HttpStatus.NOT_FOUND, "CHAT404_1", "존재하지 않는 채팅 세션입니다."),
+	CHATBOT_SERVER_ERROR(HttpStatus.SERVICE_UNAVAILABLE, "CHAT503_1", "챗봇 서버와 통신 중 오류가 발생했습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;

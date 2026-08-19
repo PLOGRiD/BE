@@ -47,7 +47,8 @@ public class ChatCommandService {
 		chatLogRepository.save(
 			ChatLog.create(chatSession, request.getMessage(), userImageUrl, ChatRole.USER, userMessageType));
 
-		String answer = chatBotService.ask(request.getMessage(), userImageUrl);
+		String answer = chatBotService.ask(
+			chatSession.getId().toString(), request.getMessage(), request.getImage());
 
 		ChatLog assistantLog = chatLogRepository.save(
 			ChatLog.create(chatSession, answer, null, ChatRole.ASSISTANT, MessageType.TEXT));
