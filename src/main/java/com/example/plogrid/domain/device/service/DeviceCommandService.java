@@ -41,7 +41,5 @@ public class DeviceCommandService {
 			.orElseThrow(() -> new GeneralException(MemberErrorCode.MEMBER_NOT_FOUND));
 
 		memberDeviceRepository.save(MemberCollectionDevice.create(member, collectionDevice));
-
-		// TODO: 디바이스 Handshake 통신 로직 추가
 	}
 }
