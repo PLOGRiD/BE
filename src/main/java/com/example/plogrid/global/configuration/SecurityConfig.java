@@ -29,8 +29,6 @@ public class SecurityConfig {
 		"/api/v1/members/auth/sign-up",
 		"/api/v1/members/auth/sign-in",
 		"/api/v1/members/auth/reissue",
-		"/api/v1/devices/token",
-		"/api/v1/devices/reissue",
 		"/api/v1/plogging/waste-classification",
 		"/api/v1/trashes/waste-classification",
 		"/api/v1/ploggings/*/events",

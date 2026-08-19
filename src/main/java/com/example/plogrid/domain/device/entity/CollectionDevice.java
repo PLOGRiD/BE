@@ -2,7 +2,6 @@ package com.example.plogrid.domain.device.entity;
 
 import com.example.plogrid.domain.common.BaseEntity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,7 +20,4 @@ public class CollectionDevice extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
-	@Column(nullable = false, unique = true)
-	private String secretKey;
 }
