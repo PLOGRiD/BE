@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.plogrid.domain.chat.dto.ChatBotHistoryDTO;
 import com.example.plogrid.domain.chat.dto.ChatBotResponseDTO;
+import com.example.plogrid.domain.chat.dto.ChatBotWasteRequestDTO;
 import com.example.plogrid.global.apiPayload.code.ChatErrorCode;
 import com.example.plogrid.global.apiPayload.exception.GeneralException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -45,6 +46,33 @@ public class ChatBotService {
 
 	@Value("${chatbot.url}")
 	private String chatbotUrl;
+
+	@Value("${chatbot.waste-url}")
+	private String wasteUrl;
+
+	public String askWasteSortingMethod(String imageUrl) {
+		ChatBotWasteRequestDTO body = new ChatBotWasteRequestDTO(imageUrl);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		headers.setAccept(List.of(MediaType.APPLICATION_JSON));
+
+		HttpEntity<ChatBotWasteRequestDTO> requestEntity = new HttpEntity<>(body, headers);
+
+		try {
+			ResponseEntity<ChatBotResponseDTO> response = restTemplate.exchange(
+				wasteUrl,
+				HttpMethod.POST,
+				requestEntity,
+				ChatBotResponseDTO.class
+			);
+
+			String answer = response.getBody() != null ? response.getBody().getAnswer() : null;
+			return StringUtils.hasText(answer) ? answer : FALLBACK_ANSWER;
+		} catch (RestClientException e) {
+			throw new GeneralException(ChatErrorCode.CHATBOT_SERVER_ERROR);
+		}
+	}
 
 	public String ask(String sessionId, String message, MultipartFile image, List<ChatBotHistoryDTO> history) {
 		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();

@@ -31,6 +31,12 @@ public class ChatConverter {
 			.build();
 	}
 
+	public static ChatResponseDTO.TrashChatMessageResponse toTrashChatMessageResponse(String answer) {
+		return ChatResponseDTO.TrashChatMessageResponse.builder()
+			.message(answer)
+			.build();
+	}
+
 	public static List<ChatResponseDTO.SessionSummary> toSessionSummaryList(List<ChatSession> chatSessions) {
 		return chatSessions.stream()
 			.map(chatSession -> ChatResponseDTO.SessionSummary.builder()

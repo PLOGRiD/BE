@@ -30,6 +30,17 @@ public class ChatRequestDTO {
 		private MultipartFile image;
 	}
 
+	@Schema(name = "단일 폐기물 질의 요청")
+	@Getter
+	@Setter
+	@NoArgsConstructor
+	public static class TrashMessageRequest {
+
+		@Schema(description = "이미지에 접근 가능한 URL (S3 presigned URL 등)", example = "https://...")
+		@NotBlank(message = "이미지 URL을 입력해주세요.")
+		private String imageUrl;
+	}
+
 	@Schema(name = "채팅 세션 삭제 요청")
 	@Getter
 	@NoArgsConstructor

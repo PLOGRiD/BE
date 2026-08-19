@@ -50,6 +50,20 @@ public class ChatController {
 	}
 
 	@Operation(
+		summary = "단일 폐기물 분리배출 방법 질의 API",
+		description = """
+			이미지 하나로 분리배출 방법만 조회합니다. 채팅 세션이나 대화내역 없이 단발성으로 답변만 받습니다.
+
+			- `imageUrl`은 필수이며, 이미지에 접근 가능한 URL이어야 합니다.
+			"""
+	)
+	@PostMapping("/wastes")
+	public ApiResponse<ChatResponseDTO.TrashChatMessageResponse> requestChat(
+		@Valid @RequestBody ChatRequestDTO.TrashMessageRequest request) {
+		return ApiResponse.onSuccess(chatCommandService.wasteSortingMethod(request.getImageUrl()));
+	}
+
+	@Operation(
 		summary = "채팅 세션 목록 조회 API",
 		description = """
 			로그인한 회원의 채팅 세션 목록을 조회합니다.

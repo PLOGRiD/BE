@@ -32,6 +32,15 @@ public class ChatResponseDTO {
 		private LocalDateTime createdAt;
 	}
 
+	@Schema(name = "채팅 응답")
+	@Builder
+	@Getter
+	public static class TrashChatMessageResponse {
+
+		@Schema(description = "챗봇 답변 텍스트", example = "이 쓰레기는 플라스틱류로 분리배출 하시면 됩니다.")
+		private String message;
+	}
+
 	@Schema(name = "채팅 세션 요약")
 	@Builder
 	@Getter

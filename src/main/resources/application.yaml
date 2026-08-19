@@ -54,6 +54,7 @@ spectral:
 
 chatbot:
   url: ${CHATBOT_URL}
+  waste-url: ${CHATBOT_WASTE_URL}
 
 trash:
   viewport:

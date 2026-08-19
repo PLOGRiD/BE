@@ -64,6 +64,11 @@ public class ChatCommandService {
 		return ChatConverter.toMessageResponse(chatSession, assistantLog);
 	}
 
+	public ChatResponseDTO.TrashChatMessageResponse wasteSortingMethod(String imageUrl) {
+		String answer = chatBotService.askWasteSortingMethod(imageUrl);
+		return ChatConverter.toTrashChatMessageResponse(answer);
+	}
+
 	public void deleteSessions(Long memberId, List<Long> chatSessionIds) {
 		List<ChatSession> chatSessions = chatSessionIds.stream()
 			.map(chatSessionId -> findOwnedSession(memberId, chatSessionId))
