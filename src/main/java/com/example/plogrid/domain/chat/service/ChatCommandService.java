@@ -3,11 +3,13 @@ package com.example.plogrid.domain.chat.service;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.plogrid.domain.chat.converter.ChatConverter;
+import com.example.plogrid.domain.chat.dto.ChatBotHistoryDTO;
 import com.example.plogrid.domain.chat.dto.ChatRequestDTO;
 import com.example.plogrid.domain.chat.dto.ChatResponseDTO;
 import com.example.plogrid.domain.chat.entity.ChatLog;
@@ -31,6 +33,8 @@ import lombok.RequiredArgsConstructor;
 public class ChatCommandService {
 
 	private static final int SESSION_TITLE_MAX_LENGTH = 20;
+	private static final int HISTORY_TURN_LIMIT = 10;
+	private static final int HISTORY_MESSAGE_LIMIT = HISTORY_TURN_LIMIT * 2;
 
 	private final ChatBotService chatBotService;
 	private final ChatSessionRepository chatSessionRepository;
@@ -41,6 +45,8 @@ public class ChatCommandService {
 	public ChatResponseDTO.MessageResponse chat(Long memberId, ChatRequestDTO.MessageRequest request) {
 		ChatSession chatSession = resolveChatSession(memberId, request.getChatSessionId(), request.getMessage());
 
+		List<ChatBotHistoryDTO> history = resolveHistory(chatSession.getId());
+
 		String userImageUrl = resolveImageUrl(request.getImage());
 		MessageType userMessageType = userImageUrl != null ? MessageType.TEXT_IMAGE : MessageType.TEXT;
 
@@ -48,7 +54,7 @@ public class ChatCommandService {
 			ChatLog.create(chatSession, request.getMessage(), userImageUrl, ChatRole.USER, userMessageType));
 
 		String answer = chatBotService.ask(
-			chatSession.getId().toString(), request.getMessage(), request.getImage());
+			chatSession.getId().toString(), request.getMessage(), request.getImage(), history);
 
 		ChatLog assistantLog = chatLogRepository.save(
 			ChatLog.create(chatSession, answer, null, ChatRole.ASSISTANT, MessageType.TEXT));
@@ -92,6 +98,13 @@ public class ChatCommandService {
 		}
 
 		return chatSession;
+	}
+
+	private List<ChatBotHistoryDTO> resolveHistory(Long chatSessionId) {
+		List<ChatLog> recentChatLogsDesc = chatLogRepository.findByChatSessionIdOrderByCreatedAtDesc(
+			chatSessionId, PageRequest.of(0, HISTORY_MESSAGE_LIMIT));
+
+		return ChatConverter.toHistory(recentChatLogsDesc);
 	}
 
 	private String resolveImageUrl(MultipartFile image) {

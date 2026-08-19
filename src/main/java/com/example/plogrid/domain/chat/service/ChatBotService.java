@@ -13,6 +13,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
@@ -20,14 +21,22 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.plogrid.domain.chat.dto.ChatBotHistoryDTO;
 import com.example.plogrid.domain.chat.dto.ChatBotResponseDTO;
 import com.example.plogrid.global.apiPayload.code.ChatErrorCode;
 import com.example.plogrid.global.apiPayload.exception.GeneralException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
+@RequiredArgsConstructor
 public class ChatBotService {
 
 	private static final String FALLBACK_ANSWER = "죄송해요, 지금은 답변을 생성하지 못했어요. 잠시 후 다시 시도해주세요.";
+
+	private final ObjectMapper objectMapper;
 
 	private final RestTemplate restTemplate = new RestTemplateBuilder()
 		.connectTimeout(Duration.ofSeconds(5))
@@ -37,13 +46,17 @@ public class ChatBotService {
 	@Value("${chatbot.url}")
 	private String chatbotUrl;
 
-	public String ask(String sessionId, String message, MultipartFile image) {
+	public String ask(String sessionId, String message, MultipartFile image, List<ChatBotHistoryDTO> history) {
 		MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
 		body.add("session_id", sessionId);
 		body.add("message", message);
 
 		if (image != null && !image.isEmpty()) {
 			body.add("image", toFileEntity(image));
+		}
+
+		if (!CollectionUtils.isEmpty(history)) {
+			body.add("history", toHistoryJson(history));
 		}
 
 		HttpHeaders headers = new HttpHeaders();
@@ -63,6 +76,14 @@ public class ChatBotService {
 			String answer = response.getBody() != null ? response.getBody().getAnswer() : null;
 			return StringUtils.hasText(answer) ? answer : FALLBACK_ANSWER;
 		} catch (RestClientException e) {
+			throw new GeneralException(ChatErrorCode.CHATBOT_SERVER_ERROR);
+		}
+	}
+
+	private String toHistoryJson(List<ChatBotHistoryDTO> history) {
+		try {
+			return objectMapper.writeValueAsString(history);
+		} catch (JsonProcessingException e) {
 			throw new GeneralException(ChatErrorCode.CHATBOT_SERVER_ERROR);
 		}
 	}

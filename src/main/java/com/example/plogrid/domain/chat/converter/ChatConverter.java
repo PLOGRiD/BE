@@ -4,9 +4,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import com.example.plogrid.domain.chat.dto.ChatBotHistoryDTO;
 import com.example.plogrid.domain.chat.dto.ChatResponseDTO;
 import com.example.plogrid.domain.chat.entity.ChatLog;
 import com.example.plogrid.domain.chat.entity.ChatSession;
@@ -55,6 +58,18 @@ public class ChatConverter {
 		}
 
 		return daysBetween + "일전";
+	}
+
+	public static List<ChatBotHistoryDTO> toHistory(List<ChatLog> recentChatLogsDesc) {
+		List<ChatLog> chronological = new ArrayList<>(recentChatLogsDesc);
+		Collections.reverse(chronological);
+
+		return chronological.stream()
+			.map(chatLog -> ChatBotHistoryDTO.builder()
+				.role(chatLog.getChatRole().name().toLowerCase())
+				.content(chatLog.getChatContent())
+				.build())
+			.toList();
 	}
 
 	public static List<ChatResponseDTO.ChatLogResponse> toChatLogResponseList(List<ChatLog> chatLogs) {
