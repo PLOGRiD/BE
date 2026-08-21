@@ -30,7 +30,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatBotService {
@@ -70,6 +72,7 @@ public class ChatBotService {
 			String answer = response.getBody() != null ? response.getBody().getAnswer() : null;
 			return StringUtils.hasText(answer) ? answer : FALLBACK_ANSWER;
 		} catch (RestClientException e) {
+			log.error("[챗봇 서버 통신 오류] wasteUrl={}", wasteUrl, e);
 			throw new GeneralException(ChatErrorCode.CHATBOT_SERVER_ERROR);
 		}
 	}
@@ -104,6 +107,7 @@ public class ChatBotService {
 			String answer = response.getBody() != null ? response.getBody().getAnswer() : null;
 			return StringUtils.hasText(answer) ? answer : FALLBACK_ANSWER;
 		} catch (RestClientException e) {
+			log.error("[챗봇 서버 통신 오류] chatbotUrl={}", chatbotUrl, e);
 			throw new GeneralException(ChatErrorCode.CHATBOT_SERVER_ERROR);
 		}
 	}
@@ -112,6 +116,7 @@ public class ChatBotService {
 		try {
 			return objectMapper.writeValueAsString(history);
 		} catch (JsonProcessingException e) {
+			log.error("[챗봇 히스토리 직렬화 오류]", e);
 			throw new GeneralException(ChatErrorCode.CHATBOT_SERVER_ERROR);
 		}
 	}
@@ -132,6 +137,7 @@ public class ChatBotService {
 				}
 			};
 		} catch (IOException e) {
+			log.error("[챗봇 이미지 첨부 변환 오류]", e);
 			throw new GeneralException(ChatErrorCode.CHATBOT_SERVER_ERROR);
 		}
 
