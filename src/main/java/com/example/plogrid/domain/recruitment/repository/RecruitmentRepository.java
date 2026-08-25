@@ -13,12 +13,12 @@ public interface RecruitmentRepository extends JpaRepository<Recruitment, Long> 
 
 	Page<Recruitment> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
-	@Modifying(clearAutomatically = true)
+	@Modifying(clearAutomatically = true, flushAutomatically = true)
 	@Query("UPDATE Recruitment r SET r.currentParticipants = r.currentParticipants + 1 "
 		+ "WHERE r.id = :recruitmentId AND r.currentParticipants < r.maxParticipants")
 	int increaseCurrentParticipants(@Param("recruitmentId") Long recruitmentId);
 
-	@Modifying(clearAutomatically = true)
+	@Modifying(clearAutomatically = true, flushAutomatically = true)
 	@Query("UPDATE Recruitment r SET r.currentParticipants = r.currentParticipants - 1 "
 		+ "WHERE r.id = :recruitmentId AND r.currentParticipants > 0")
 	int decreaseCurrentParticipants(@Param("recruitmentId") Long recruitmentId);
