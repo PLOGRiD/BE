@@ -51,6 +51,7 @@ public class RecruitmentResponseDTO {
 		private Integer currentParticipants;
 		private Integer maxParticipants;
 		private RecruitmentStatus eventStatus;
+		private Boolean isParticipating;
 	}
 
 	@Schema(name = "모집 참여 토글 응답")

@@ -37,12 +37,15 @@ public class RecruitmentQueryService {
 		return RecruitmentConverter.toRecruitmentListResponseDTO(recruitments, currentParticipantCounts);
 	}
 
-	public RecruitmentResponseDTO.RecruitmentDetailResponseDTO getRecruitmentDetail(Long recruitmentId) {
+	public RecruitmentResponseDTO.RecruitmentDetailResponseDTO getRecruitmentDetail(Long memberId, Long recruitmentId) {
 		Recruitment recruitment = recruitmentRepository.findById(recruitmentId)
 			.orElseThrow(() -> new GeneralException(RecruitmentErrorCode.RECRUITMENT_NOT_FOUND));
 
 		int currentParticipants = recruitmentParticipantRepository.countByRecruitmentId(recruitmentId);
+		boolean isParticipating = recruitmentParticipantRepository.existsByMemberIdAndRecruitmentId(memberId,
+			recruitmentId);
 
-		return RecruitmentConverter.toRecruitmentDetailResponseDTO(recruitment, currentParticipants);
+		return RecruitmentConverter.toRecruitmentDetailResponseDTO(recruitment, currentParticipants,
+			isParticipating);
 	}
 }

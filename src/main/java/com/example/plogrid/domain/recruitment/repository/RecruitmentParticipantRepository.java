@@ -11,4 +11,6 @@ public interface RecruitmentParticipantRepository extends JpaRepository<Recruitm
 	int countByRecruitmentId(Long recruitmentId);
 
 	Optional<RecruitmentParticipant> findByMemberIdAndRecruitmentId(Long memberId, Long recruitmentId);
+
+	boolean existsByMemberIdAndRecruitmentId(Long memberId, Long recruitmentId);
 }

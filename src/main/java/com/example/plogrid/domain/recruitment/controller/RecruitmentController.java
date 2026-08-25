@@ -54,9 +54,10 @@ public class RecruitmentController {
 	)
 	@GetMapping("/{recruitmentId}")
 	public ApiResponse<RecruitmentResponseDTO.RecruitmentDetailResponseDTO> getRecruitmentDetail(
+		@AuthUser Long memberId,
 		@PathVariable Long recruitmentId
 	) {
-		return ApiResponse.onSuccess(recruitmentQueryService.getRecruitmentDetail(recruitmentId));
+		return ApiResponse.onSuccess(recruitmentQueryService.getRecruitmentDetail(memberId, recruitmentId));
 	}
 
 	@Operation(

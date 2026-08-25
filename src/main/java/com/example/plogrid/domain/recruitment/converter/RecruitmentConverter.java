@@ -43,7 +43,7 @@ public class RecruitmentConverter {
 	}
 
 	public static RecruitmentResponseDTO.RecruitmentDetailResponseDTO toRecruitmentDetailResponseDTO(
-		Recruitment recruitment, int currentParticipants) {
+		Recruitment recruitment, int currentParticipants, boolean isParticipating) {
 		return RecruitmentResponseDTO.RecruitmentDetailResponseDTO.builder()
 			.title(recruitment.getTitle())
 			.hostName(recruitment.getHost().getName())
@@ -54,6 +54,7 @@ public class RecruitmentConverter {
 			.currentParticipants(currentParticipants)
 			.maxParticipants(recruitment.getMaxParticipants())
 			.eventStatus(recruitment.getStatus())
+			.isParticipating(isParticipating)
 			.build();
 	}
 
