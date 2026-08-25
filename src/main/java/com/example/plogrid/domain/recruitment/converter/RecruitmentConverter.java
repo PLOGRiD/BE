@@ -30,6 +30,7 @@ public class RecruitmentConverter {
 	public static RecruitmentResponseDTO.RecruitmentInfoResponseDTO toRecruitmentInfoResponseDTO(
 		Recruitment recruitment, int currentParticipants) {
 		return RecruitmentResponseDTO.RecruitmentInfoResponseDTO.builder()
+			.recruitmentId(recruitment.getId())
 			.title(recruitment.getTitle())
 			.hostName(recruitment.getHost().getName())
 			.eventDateTime(recruitment.getEventDateTime())

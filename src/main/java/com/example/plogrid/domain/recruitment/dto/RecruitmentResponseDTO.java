@@ -27,6 +27,7 @@ public class RecruitmentResponseDTO {
 	@Builder
 	@Getter
 	public static class RecruitmentInfoResponseDTO {
+		private Long recruitmentId;
 		private String title;
 		private String hostName;
 		private LocalDateTime eventDateTime;
