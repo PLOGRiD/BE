@@ -30,6 +30,7 @@ public class RecruitmentResponseDTO {
 		private Long recruitmentId;
 		private String title;
 		private String hostName;
+		private String thumbnailImageUrl;
 		private LocalDateTime eventDateTime;
 		private String eventLocation;
 		private Integer currentParticipants;

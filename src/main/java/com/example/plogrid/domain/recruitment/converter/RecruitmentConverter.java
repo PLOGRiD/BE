@@ -33,6 +33,7 @@ public class RecruitmentConverter {
 			.recruitmentId(recruitment.getId())
 			.title(recruitment.getTitle())
 			.hostName(recruitment.getHost().getName())
+			.thumbnailImageUrl(recruitment.getThumbnailImageUrl())
 			.eventDateTime(recruitment.getEventDateTime())
 			.eventLocation(recruitment.getEventLocation())
 			.currentParticipants(currentParticipants)
