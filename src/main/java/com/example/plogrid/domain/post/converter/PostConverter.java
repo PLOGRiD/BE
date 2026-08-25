@@ -35,6 +35,8 @@ public class PostConverter {
 
 	public static PostResponseDTO.InfoResponseDTO toInfoResponseDTO(Post post, int likeCount, boolean isLiked) {
 		return PostResponseDTO.InfoResponseDTO.builder()
+			.postId(post.getId())
+			.postTitle(post.getPostTitle())
 			.authorNickname(DUMMY_AUTHOR_NICKNAME)
 			.authorProfileImageUrl(DUMMY_AUTHOR_PROFILE_IMAGE_URL)
 			.postContent(post.getPostContent())

@@ -25,6 +25,8 @@ public class PostResponseDTO {
 	@Builder
 	@Getter
 	public static class InfoResponseDTO {
+		private Long postId;
+		private String postTitle;
 		private String authorNickname;
 		private String authorProfileImageUrl;
 		private String postContent;
