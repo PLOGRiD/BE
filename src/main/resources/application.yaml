@@ -46,6 +46,9 @@ cloud:
     s3:
       bucket: ${AWS_S3_BUCKET}
 
+predict:
+  url: ${PREDICT_URL}
+
 yolo:
   url: ${YOLO_URL}
 

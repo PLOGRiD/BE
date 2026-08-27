@@ -2,19 +2,14 @@ package com.example.plogrid.domain.trash.service;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.plogrid.domain.plogging.dto.SpectralResponseDTO;
-import com.example.plogrid.domain.plogging.dto.YoloResponseDTO;
+import com.example.plogrid.domain.plogging.dto.PredictResponseDTO;
 import com.example.plogrid.domain.plogging.entity.Plogging;
-import com.example.plogrid.domain.plogging.service.SpectralSensorService;
-import com.example.plogrid.domain.plogging.service.YoloService;
 import com.example.plogrid.domain.trash.dto.TrashRequestDTO;
 import com.example.plogrid.domain.trash.entity.Trash;
 import com.example.plogrid.domain.trash.entity.enums.TrashCategory;
@@ -32,8 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TrashClassificationService {
 
-	private final YoloService yoloService;
-	private final SpectralSensorService spectralSensorService;
+	private final WastePredictionService wastePredictionService;
 	private final TrashRepository trashRepository;
 	private final S3Uploader s3Uploader;
 	private final ApplicationEventPublisher eventPublisher;
@@ -41,20 +35,17 @@ public class TrashClassificationService {
 	public void trashClassification(
 		TrashRequestDTO.WasteClassification request, Plogging plogging) throws IOException {
 
-		YoloResponseDTO result = yoloService.predict(request.getImage());
+		PredictResponseDTO result = wastePredictionService.predict(request);
 
-		YoloResponseDTO.Detection detection = result.getDetections().stream()
-			.max(Comparator.comparingDouble(YoloResponseDTO.Detection::getConfidence))
-			.orElseThrow(() -> new GeneralException(TrashErrorCode.NO_TRASH_DETECTED));
+		TrashCategory category;
+		TrashSubCategory subCategory;
 
-		TrashSubCategory subCategory = resolveSubCategory(detection.getClassName());
-		TrashCategory category = subCategory.getCategory();
-
-		boolean needsSpectralAnalysis = SPECTRAL_TARGET_CLASSES.contains(detection.getClassName());
-
-		if (needsSpectralAnalysis) {
-			SpectralResponseDTO spectralResult = spectralSensorService.predict(request);
-			category = resolveCategory(spectralResult.getLabel());
+		if (result.isLabelOverridden()) {
+			category = resolveCategoryByMaterial(result.getFinalLabel());
+			subCategory = null;
+		} else {
+			subCategory = resolveSubCategory(result.getFinalLabel());
+			category = subCategory.getCategory();
 		}
 
 		String trashImage = s3Uploader.uploadTrashImage(request.getImage());
@@ -84,27 +75,16 @@ public class TrashClassificationService {
 			.orElseThrow(() -> new GeneralException(TrashErrorCode.UNKNOWN_TRASH_CLASS));
 	}
 
-	private TrashCategory resolveCategory(String label) {
-		TrashCategory category = SPECTRAL_LABEL_TO_CATEGORY.get(label);
+	private TrashCategory resolveCategoryByMaterial(String materialLabel) {
+		TrashCategory category = MATERIAL_LABEL_TO_CATEGORY.get(materialLabel);
 		if (category == null) {
 			throw new GeneralException(TrashErrorCode.UNKNOWN_TRASH_CLASS);
 		}
 		return category;
 	}
 
-	private static final Map<String, TrashCategory> SPECTRAL_LABEL_TO_CATEGORY = Map.of(
-		"glass", TrashCategory.GLASS,
-		"PET", TrashCategory.PET_BOTTLE
-	);
-
-	private static final Set<String> SPECTRAL_TARGET_CLASSES = Set.of(
-		TrashSubCategory.OTHER_BOTTLE.getName(),
-		TrashSubCategory.BEER_BOTTLE.getName(),
-		TrashSubCategory.TONIC_BOTTLE.getName(),
-		TrashSubCategory.SOJU_BOTTLE.getName(),
-		TrashSubCategory.BEVERAGE_BOTTLE.getName(),
-		TrashSubCategory.KITCHEN_CONTAINER.getName(),
-		TrashSubCategory.DISPOSABLE_DRINK_CUP.getName(),
-		TrashSubCategory.PET_BOTTLE.getName()
+	private static final Map<String, TrashCategory> MATERIAL_LABEL_TO_CATEGORY = Map.of(
+		"유리", TrashCategory.GLASS,
+		"투명 플라스틱", TrashCategory.PET_BOTTLE
 	);
 }

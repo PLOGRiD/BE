@@ -54,7 +54,6 @@ public class Trash extends BaseEntity {
 	private TrashCategory category;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
 	private TrashSubCategory subCategory;
 
 	public double getLatitude() {
