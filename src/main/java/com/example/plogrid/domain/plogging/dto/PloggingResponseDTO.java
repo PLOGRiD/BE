@@ -1,5 +1,6 @@
 package com.example.plogrid.domain.plogging.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.plogrid.domain.trash.entity.enums.TrashCategory;
@@ -75,6 +76,7 @@ public class PloggingResponseDTO {
 		private double distanceMeters;
 		private double durationSeconds;
 		private int trashCount;
+		private LocalDateTime createdAt;
 	}
 
 	@Schema(name = "플로깅 진행 중 응답")

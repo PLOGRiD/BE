@@ -57,6 +57,7 @@ public class PloggingConverter {
 			.distanceMeters(plogging.getDistanceMeters())
 			.durationSeconds(plogging.getDurationSeconds())
 			.trashCount(trashCount)
+			.createdAt(plogging.getCreatedAt())
 			.build();
 	}
 
