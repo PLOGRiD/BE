@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +33,7 @@ public class TrashClassificationService {
 	private final S3Uploader s3Uploader;
 	private final ApplicationEventPublisher eventPublisher;
 
+	@Async("taskExecutor")
 	public void trashClassification(
 		TrashRequestDTO.WasteClassification request, Plogging plogging) throws IOException {
 
