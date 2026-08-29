@@ -33,6 +33,7 @@ public class SecurityConfig {
 		"/api/v1/trashes/waste-classification",
 		"/api/v1/ploggings/*/events",
 		"/api/v1/health",
+		"/actuator/prometheus",
 		"/swagger-ui/**",
 		"/swagger-resources/**",
 		"/v3/api-docs/**",
