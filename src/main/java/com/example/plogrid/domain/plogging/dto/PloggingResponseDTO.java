@@ -19,15 +19,6 @@ public class PloggingResponseDTO {
 		private Long ploggingId;
 	}
 
-	@Schema(name = "쓰레기 분류 응답")
-	@Builder
-	@Getter
-	public static class TrashClassificationResponseDTO {
-
-		private YoloResponseDTO result;
-		private SpectralResponseDTO spectralResult;
-	}
-
 	@Schema(name = "플로깅 종료 응답")
 	@Builder
 	@Getter

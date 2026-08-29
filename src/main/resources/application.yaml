@@ -49,12 +49,6 @@ cloud:
 predict:
   url: ${PREDICT_URL}
 
-yolo:
-  url: ${YOLO_URL}
-
-spectral:
-  url: ${SPECTRAL_URL}
-
 chatbot:
   url: ${CHATBOT_URL}
   waste-url: ${CHATBOT_WASTE_URL}
