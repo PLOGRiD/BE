@@ -6,6 +6,11 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+
+import com.example.plogrid.global.sse.SseRedisSubscriber;
+import com.example.plogrid.global.sse.SseService;
 
 @Configuration
 public class RedisConfig {
@@ -24,5 +29,20 @@ public class RedisConfig {
 	@Bean
 	public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory factory) {
 		return new StringRedisTemplate(factory);
+	}
+
+	@Bean
+	public RedisMessageListenerContainer redisMessageListenerContainer(
+		RedisConnectionFactory connectionFactory, SseRedisSubscriber sseRedisSubscriber) {
+
+		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+		container.setConnectionFactory(connectionFactory);
+		container.addMessageListener(sseRedisSubscriber, sseTopic());
+		return container;
+	}
+
+	@Bean
+	public ChannelTopic sseTopic() {
+		return new ChannelTopic(SseService.SSE_CHANNEL);
 	}
 }
