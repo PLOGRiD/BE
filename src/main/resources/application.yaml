@@ -62,3 +62,16 @@ chatbot:
 trash:
   viewport:
     max-result-size: ${TRASH_VIEWPORT_MAX_RESULT_SIZE:200}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, prometheus
+  endpoint:
+    health:
+      show-details: never
+  prometheus:
+    metrics:
+      export:
+        enabled: true
