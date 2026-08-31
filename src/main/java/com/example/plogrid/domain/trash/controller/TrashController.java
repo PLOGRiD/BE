@@ -1,6 +1,5 @@
 package com.example.plogrid.domain.trash.controller;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.validation.annotation.Validated;
@@ -92,8 +91,8 @@ public class TrashController {
 	)
 	@PostMapping(value = "/waste-classification", consumes = "multipart/form-data")
 	public ApiResponse<Void> trashClassification(
-		@Valid @ModelAttribute TrashRequestDTO.WasteClassification request) throws IOException {
-		trashCommandService.trashProcess(request, request.getDeviceId());
+		@Valid @ModelAttribute TrashRequestDTO.WasteClassification request) {
+		trashCommandService.trashProcessViaStream(request, request.getDeviceId());
 		return ApiResponse.onSuccess(null);
 	}
 }
