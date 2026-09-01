@@ -14,6 +14,8 @@ public interface TrashRepository extends JpaRepository<Trash, Long> {
 
 	int countByPloggingId(Long ploggingId);
 
+	boolean existsBySourceRecordId(String sourceRecordId);
+
 	@Query(value = """
 		SELECT * FROM trash t
 		WHERE t.location && ST_MakeEnvelope(:minLng, :minLat, :maxLng, :maxLat, 4326)

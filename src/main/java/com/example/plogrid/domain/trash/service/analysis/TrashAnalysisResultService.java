@@ -29,9 +29,14 @@ public class TrashAnalysisResultService {
 	private final TrashRepository trashRepository;
 	private final ApplicationEventPublisher eventPublisher;
 
-	public void save(Map<String, String> fields) {
+	public void save(String sourceRecordId, Map<String, String> fields) {
 		if (!"success".equals(fields.get("status"))) {
 			log.warn("쓰레기 분석 실패 결과 수신 - fields: {}", fields);
+			return;
+		}
+
+		if (trashRepository.existsBySourceRecordId(sourceRecordId)) {
+			log.warn("이미 처리된 분석 결과 재전달, 스킵 - recordId: {}", sourceRecordId);
 			return;
 		}
 
@@ -54,6 +59,7 @@ public class TrashAnalysisResultService {
 
 		Trash trash = Trash.create(
 			plogging,
+			sourceRecordId,
 			fields.get("imageUrl"),
 			Double.parseDouble(fields.get("latitude")),
 			Double.parseDouble(fields.get("longitude")),

@@ -43,6 +43,9 @@ public class Trash extends BaseEntity {
 	@JoinColumn(name = "plogging_id", nullable = false)
 	private Plogging plogging;
 
+	@Column(nullable = false, unique = true)
+	private String sourceRecordId;
+
 	@Column(nullable = false)
 	private String trashImage;
 
@@ -64,10 +67,11 @@ public class Trash extends BaseEntity {
 		return location.getX();
 	}
 
-	public static Trash create(Plogging plogging, String trashImage, double latitude, double longitude,
-		TrashCategory category, TrashSubCategory subCategory) {
+	public static Trash create(Plogging plogging, String sourceRecordId, String trashImage, double latitude,
+		double longitude, TrashCategory category, TrashSubCategory subCategory) {
 		return Trash.builder()
 			.plogging(plogging)
+			.sourceRecordId(sourceRecordId)
 			.trashImage(trashImage)
 			.location(toPoint(latitude, longitude))
 			.category(category)
