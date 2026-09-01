@@ -1,11 +1,25 @@
 package com.example.plogrid.global.configuration;
 
+import java.time.Duration;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.RedisSystemException;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
+import org.springframework.data.redis.connection.stream.Consumer;
+import org.springframework.data.redis.connection.stream.MapRecord;
+import org.springframework.data.redis.connection.stream.ReadOffset;
+import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.stream.StreamMessageListenerContainer;
+
+import com.example.plogrid.domain.trash.service.analysis.TrashAnalysisResultConsumer;
+import com.example.plogrid.global.sse.SseRedisSubscriber;
+import com.example.plogrid.global.sse.SseService;
 
 @Configuration
 public class RedisConfig {
@@ -24,5 +38,57 @@ public class RedisConfig {
 	@Bean
 	public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory factory) {
 		return new StringRedisTemplate(factory);
+	}
+
+	@Bean
+	public RedisMessageListenerContainer redisMessageListenerContainer(
+		RedisConnectionFactory connectionFactory, SseRedisSubscriber sseRedisSubscriber) {
+
+		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+		container.setConnectionFactory(connectionFactory);
+		container.addMessageListener(sseRedisSubscriber, sseTopic());
+		return container;
+	}
+
+	@Bean
+	public ChannelTopic sseTopic() {
+		return new ChannelTopic(SseService.SSE_CHANNEL);
+	}
+
+	@Bean(initMethod = "start", destroyMethod = "stop")
+	public StreamMessageListenerContainer<String, MapRecord<String, String, String>> trashAnalysisResultStreamContainer(
+		RedisConnectionFactory connectionFactory, StringRedisTemplate stringRedisTemplate,
+		TrashAnalysisResultConsumer trashAnalysisResultConsumer) {
+
+		createConsumerGroupIfNotExists(stringRedisTemplate);
+
+		StreamMessageListenerContainer.StreamMessageListenerContainerOptions<String, MapRecord<String, String, String>> options =
+			StreamMessageListenerContainer.StreamMessageListenerContainerOptions.builder()
+				.pollTimeout(Duration.ofSeconds(2))
+				.build();
+
+		StreamMessageListenerContainer<String, MapRecord<String, String, String>> container =
+			StreamMessageListenerContainer.create(connectionFactory, options);
+
+		container.receive(
+			Consumer.from(TrashAnalysisResultConsumer.GROUP, trashAnalysisResultConsumer.getConsumerName()),
+			StreamOffset.create(TrashAnalysisResultConsumer.STREAM_KEY, ReadOffset.lastConsumed()),
+			trashAnalysisResultConsumer
+		);
+
+		return container;
+	}
+
+	private void createConsumerGroupIfNotExists(StringRedisTemplate stringRedisTemplate) {
+		try {
+			stringRedisTemplate.opsForStream()
+				.createGroup(TrashAnalysisResultConsumer.STREAM_KEY, ReadOffset.from("0"), TrashAnalysisResultConsumer.GROUP);
+		} catch (RedisSystemException e) {
+			boolean alreadyExists = e.getCause() != null && e.getCause().getMessage() != null
+				&& e.getCause().getMessage().contains("BUSYGROUP");
+			if (!alreadyExists) {
+				throw e;
+			}
+		}
 	}
 }

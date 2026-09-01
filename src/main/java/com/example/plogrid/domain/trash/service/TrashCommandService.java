@@ -1,7 +1,5 @@
 package com.example.plogrid.domain.trash.service;
 
-import java.io.IOException;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,10 +8,10 @@ import com.example.plogrid.domain.device.repository.MemberDeviceRepository;
 import com.example.plogrid.domain.plogging.entity.Plogging;
 import com.example.plogrid.domain.plogging.entity.enums.PloggingStatus;
 import com.example.plogrid.domain.trash.dto.TrashRequestDTO;
+import com.example.plogrid.domain.trash.service.analysis.TrashAnalysisRequestProducer;
 import com.example.plogrid.global.apiPayload.code.DeviceErrorCode;
 import com.example.plogrid.global.apiPayload.code.PloggingErrorCode;
 import com.example.plogrid.global.apiPayload.exception.GeneralException;
-import com.example.plogrid.global.multipart.InMemoryMultipartFile;
 import com.example.plogrid.global.sse.SseService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,10 +22,10 @@ import lombok.RequiredArgsConstructor;
 public class TrashCommandService {
 
 	private final MemberDeviceRepository memberDeviceRepository;
-	private final TrashClassificationService trashClassificationService;
+	private final TrashAnalysisRequestProducer trashAnalysisRequestProducer;
 	private final SseService sseService;
 
-	public void trashProcess(TrashRequestDTO.WasteClassification request, Long deviceId) throws IOException {
+	public void trashProcessViaStream(TrashRequestDTO.WasteClassification request, Long deviceId) {
 		MemberCollectionDevice memberCollectionDevice = memberDeviceRepository.findByCollectionDeviceId(deviceId)
 			.orElseThrow(() -> new GeneralException(DeviceErrorCode.DEVICE_NOT_LINKED));
 
@@ -38,10 +36,8 @@ public class TrashCommandService {
 		}
 
 		Long memberId = memberCollectionDevice.getMember().getId();
-
-		request.setImage(new InMemoryMultipartFile(request.getImage()));
-		trashClassificationService.trashClassification(request, plogging);
-
 		sseService.send(memberId, "trash-detective-event", "쓰레기 투입이 감지되었어요!");
+
+		trashAnalysisRequestProducer.publish(request, plogging);
 	}
 }

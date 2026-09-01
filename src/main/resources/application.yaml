@@ -56,6 +56,8 @@ chatbot:
 trash:
   viewport:
     max-result-size: ${TRASH_VIEWPORT_MAX_RESULT_SIZE:200}
+  analysis:
+    consumer-name: ${TRASH_ANALYSIS_CONSUMER_NAME}
 
 management:
   endpoints:
