@@ -28,7 +28,7 @@ public class TrashAnalysisResultConsumer implements StreamListener<String, MapRe
 	@Override
 	public void onMessage(MapRecord<String, String, String> record) {
 		try {
-			trashAnalysisResultService.save(record.getValue());
+			trashAnalysisResultService.save(record.getId().getValue(), record.getValue());
 			stringRedisTemplate.opsForStream().acknowledge(STREAM_KEY, GROUP, record.getId());
 		} catch (Exception e) {
 			log.error("쓰레기 분석 결과 처리 실패 - recordId: {}, fields: {} (ACK 보류, PEL에서 재처리 필요)",
