@@ -13,13 +13,9 @@ import org.springframework.data.redis.connection.stream.MapRecord;
 import org.springframework.data.redis.connection.stream.ReadOffset;
 import org.springframework.data.redis.connection.stream.StreamOffset;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.stream.StreamMessageListenerContainer;
 
 import com.example.plogrid.domain.trash.service.analysis.TrashAnalysisResultConsumer;
-import com.example.plogrid.global.sse.SseRedisSubscriber;
-import com.example.plogrid.global.sse.SseService;
 
 @Configuration
 public class RedisConfig {
@@ -38,21 +34,6 @@ public class RedisConfig {
 	@Bean
 	public StringRedisTemplate stringRedisTemplate(RedisConnectionFactory factory) {
 		return new StringRedisTemplate(factory);
-	}
-
-	@Bean
-	public RedisMessageListenerContainer redisMessageListenerContainer(
-		RedisConnectionFactory connectionFactory, SseRedisSubscriber sseRedisSubscriber) {
-
-		RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-		container.setConnectionFactory(connectionFactory);
-		container.addMessageListener(sseRedisSubscriber, sseTopic());
-		return container;
-	}
-
-	@Bean
-	public ChannelTopic sseTopic() {
-		return new ChannelTopic(SseService.SSE_CHANNEL);
 	}
 
 	@Bean(initMethod = "start", destroyMethod = "stop")
